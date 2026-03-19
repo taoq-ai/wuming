@@ -15,7 +15,7 @@ You can list all available presets programmatically:
 import "github.com/taoq-ai/wuming/adapter/preset"
 
 names := preset.List()
-// ["appi", "dpdp", "gdpr", "hipaa", "lgpd", "pci-dss", "pipa", "pipeda", "pipl", "privacy-act"]
+// ["ai-act", "appi", "dpdp", "gdpr", "hipaa", "lgpd", "pci-dss", "pipa", "pipeda", "pipl", "privacy-act"]
 ```
 
 ## Available Presets
@@ -27,6 +27,19 @@ names := preset.List()
 - **Locales**: common, eu, nl, de, fr, gb
 - **PII types**: all
 - **Min severity**: Low
+
+### AI Act
+
+**EU AI Act** -- scrub training and validation data for high-risk AI systems (Articles 10, 15).
+
+- **Locales**: all 14 (au, br, ca, cn, common, de, eu, fr, gb, in, jp, kr, nl, us)
+- **PII types**: all
+- **Min severity**: Low
+
+```go
+w := wuming.New(wuming.WithPreset("ai-act"))
+result, err := w.Process(ctx, text)
+```
 
 ### HIPAA
 

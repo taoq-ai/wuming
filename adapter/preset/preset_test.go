@@ -9,7 +9,7 @@ import (
 func TestListReturnsAllPresets(t *testing.T) {
 	names := List()
 	want := []string{
-		"appi", "dpdp", "gdpr", "hipaa", "lgpd",
+		"ai-act", "appi", "dpdp", "gdpr", "hipaa", "lgpd",
 		"pci-dss", "pipa", "pipeda", "pipl", "privacy-act",
 	}
 	if len(names) != len(want) {
@@ -48,6 +48,19 @@ func TestGetUnknownPresetReturnsError(t *testing.T) {
 	_, err := Get("nonexistent")
 	if err == nil {
 		t.Error("Get(\"nonexistent\") should return an error")
+	}
+}
+
+func TestAIActPreset(t *testing.T) {
+	p, _ := Get("ai-act")
+	assertLocales(t, p, []string{
+		"au", "br", "ca", "cn", "common", "de", "eu",
+		"fr", "gb", "in", "jp", "kr", "nl", "us",
+	})
+	assertSeverity(t, p, model.Low)
+	// AI Act covers all PII types across all locales.
+	if len(p.PIITypes) != len(allPIITypes()) {
+		t.Errorf("ai-act: got %d PII types, want %d", len(p.PIITypes), len(allPIITypes()))
 	}
 }
 

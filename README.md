@@ -16,7 +16,7 @@
 
 - **Zero-config detection** — a single function call catches all PII globally, no setup required
 - **Global coverage** — 14 locales, 75+ detectors spanning every major region (Americas, Europe, Asia-Pacific)
-- **10 compliance presets** — preconfigured profiles for GDPR, HIPAA, PCI-DSS, LGPD, APPI, PIPL, PIPA, DPDP, PIPEDA, and Privacy Act
+- **11 compliance presets** — preconfigured profiles for GDPR, AI Act, HIPAA, PCI-DSS, LGPD, APPI, PIPL, PIPA, DPDP, PIPEDA, and Privacy Act
 - **Locale-aware registry** — filter detectors with `WithLocale()` so only relevant patterns run
 - **Hexagonal architecture** — clean separation between domain logic, ports, and adapters
 - **Pluggable replacers** — redact, mask, hash, or bring your own replacement strategy
@@ -102,6 +102,7 @@ Presets bundle the right locales and PII types for a specific regulation. Use th
 | Preset        | Regulation                                               | Locales                        |
 |---------------|----------------------------------------------------------|--------------------------------|
 | `gdpr`        | EU General Data Protection Regulation                    | common, eu, nl, de, fr, gb     |
+| `ai-act`      | EU AI Act (Articles 10, 15)                              | all 14 locales                 |
 | `hipaa`       | US Health Insurance Portability and Accountability Act   | common, us                     |
 | `pci-dss`     | Payment Card Industry Data Security Standard             | common                         |
 | `lgpd`        | Brazil Lei Geral de Protecao de Dados                    | common, br                     |
