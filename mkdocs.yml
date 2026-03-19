@@ -1,0 +1,80 @@
+site_name: wuming (无名)
+site_description: "The Nameless — A Go library for detecting and removing PII from text"
+site_url: https://taoq-ai.github.io/wuming
+repo_url: https://github.com/taoq-ai/wuming
+repo_name: taoq-ai/wuming
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Hexagonal Design: architecture/hexagonal.md
+  - Detectors:
+    - Overview: detectors/overview.md
+    - Common (Global): detectors/common.md
+    - United States: detectors/us.md
+    - Netherlands: detectors/nl.md
+    - EU-wide: detectors/eu.md
+    - United Kingdom: detectors/gb.md
+    - Germany: detectors/de.md
+    - France: detectors/fr.md
+  - Replacers: replacers.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/taoq-ai/wuming
