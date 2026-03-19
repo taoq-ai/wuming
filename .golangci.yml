@@ -11,7 +11,18 @@ linters:
     - ineffassign
     - misspell
     - gofmt
+    - gocyclo
+    - gocritic
+    - revive
 
 linters-settings:
   misspell:
     locale: US
+  gocyclo:
+    min-complexity: 15
+  revive:
+    rules:
+      - name: blank-imports
+      - name: exported
+      - name: unreachable-code
+      - name: dot-imports
