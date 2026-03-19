@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.4.0](https://github.com/taoq-ai/wuming/compare/v0.3.4...v0.4.0) (2026-03-19)
+
+
+### Features
+
+* add common/global PII detectors — email, credit card, IP, URL, IBAN, MAC ([#40](https://github.com/taoq-ai/wuming/issues/40)) ([d9eb141](https://github.com/taoq-ai/wuming/commit/d9eb141e752a5984000d5e98a83701d7c0eb1d9e)), closes [#7](https://github.com/taoq-ai/wuming/issues/7)
+* add EU-wide PII detectors — VAT ID, passport MRZ ([#45](https://github.com/taoq-ai/wuming/issues/45)) ([b9b40ac](https://github.com/taoq-ai/wuming/commit/b9b40ac7d795a8e7b57fd48f6474d07a71a2b47a))
+* add France PII detectors — NIR, NIF, phone, code postal, CNI ([#49](https://github.com/taoq-ai/wuming/issues/49)) ([888787e](https://github.com/taoq-ai/wuming/commit/888787e3271cc06a76e5789c70cddca8fcbf217f))
+* add Germany PII detectors — ID card, Steuer-ID, phone, PLZ ([#50](https://github.com/taoq-ai/wuming/issues/50)) ([8a12f55](https://github.com/taoq-ai/wuming/commit/8a12f55a6e8c869b1ebe1d0daefffa94c60737b1))
+* add Netherlands PII detectors — BSN, phone, postal code, KvK, Dutch ID ([#48](https://github.com/taoq-ai/wuming/issues/48)) ([b243fa7](https://github.com/taoq-ai/wuming/commit/b243fa7ebf5a1b341c3aab47a98de05727508a50))
+* add UK PII detectors — NIN, NHS, phone, postcode, UTR ([#46](https://github.com/taoq-ai/wuming/issues/46)) ([1890580](https://github.com/taoq-ai/wuming/commit/18905803fa1d89055e859ee0337a727b4afaa8e6))
+* add US PII detectors — SSN, EIN, phone, ZIP, passport, ITIN, Medicare ([#41](https://github.com/taoq-ai/wuming/issues/41)) ([cc8ac96](https://github.com/taoq-ai/wuming/commit/cc8ac96dfa3c89913e11aca43c65297c59c55082)), closes [#8](https://github.com/taoq-ai/wuming/issues/8)
+* v0.1.0 foundation — hexagonal architecture scaffold ([#30](https://github.com/taoq-ai/wuming/issues/30)) ([ea52c0d](https://github.com/taoq-ai/wuming/commit/ea52c0df217fec5653056b99bba94691e9dd8925))
+
+
+### Bug Fixes
+
+* force first release as v0.1.0 via release-as ([#37](https://github.com/taoq-ai/wuming/issues/37)) ([8e76b7e](https://github.com/taoq-ai/wuming/commit/8e76b7ea82f0c3dc89d2da683d4a827fc115e9a7)), closes [#25](https://github.com/taoq-ai/wuming/issues/25)
+* remove bump-patch-for-minor-pre-major so feat: bumps minor ([#43](https://github.com/taoq-ai/wuming/issues/43)) ([3322dc8](https://github.com/taoq-ai/wuming/commit/3322dc812481fa9ab4146a79f86e0a1394c8a292))
+* set initial manifest version to 0.0.1 for correct pre-1.0 bumping ([#34](https://github.com/taoq-ai/wuming/issues/34)) ([a39fcf0](https://github.com/taoq-ai/wuming/commit/a39fcf0ac7b23a4f092d76ab120c90382e52d8fd)), closes [#25](https://github.com/taoq-ai/wuming/issues/25)
+* use fence_code_format for Mermaid in mkdocs.yml ([#58](https://github.com/taoq-ai/wuming/issues/58)) ([b38b3a9](https://github.com/taoq-ai/wuming/commit/b38b3a9eed1f9090ee7131e8a58426ae5d4303e6))
+* use PAT for release-please to allow PR creation ([#32](https://github.com/taoq-ai/wuming/issues/32)) ([6d4b933](https://github.com/taoq-ai/wuming/commit/6d4b9330efe6f6fdf2c8aa45594ad0cffea3635e)), closes [#25](https://github.com/taoq-ai/wuming/issues/25)
+
+
+### Documentation
+
+* add CITATION.cff for academic citation ([#51](https://github.com/taoq-ai/wuming/issues/51)) ([c6ad237](https://github.com/taoq-ai/wuming/commit/c6ad237a93f2d5a7fc177ccbc11cd0d650e0045a))
+* add MkDocs site with Material theme and GitHub Pages deployment ([#55](https://github.com/taoq-ai/wuming/issues/55)) ([0bd2a41](https://github.com/taoq-ai/wuming/commit/0bd2a41a9e9e36d10fb021fab5f4faae33a48faa))
+* add README, CONTRIBUTING, ARCHITECTURE, SECURITY, and examples ([#53](https://github.com/taoq-ai/wuming/issues/53)) ([87e37bc](https://github.com/taoq-ai/wuming/commit/87e37bc74d898fd8588e7368d6493e3a5c5fffd2))
+
+
+### Miscellaneous
+
+* **main:** release 0.1.0 ([#38](https://github.com/taoq-ai/wuming/issues/38)) ([cbb5e8b](https://github.com/taoq-ai/wuming/commit/cbb5e8bdddeabc427871fda0d2fd5dfda51e911c))
+* **main:** release 0.2.0 ([#44](https://github.com/taoq-ai/wuming/issues/44)) ([699851d](https://github.com/taoq-ai/wuming/commit/699851d107b41e974e08530274b47c8f935347af))
+* **main:** release 0.3.0 ([#47](https://github.com/taoq-ai/wuming/issues/47)) ([9354e57](https://github.com/taoq-ai/wuming/commit/9354e5757ea33c37a555aaba7266bcf4560d3d16))
+* **main:** release 0.3.1 ([#52](https://github.com/taoq-ai/wuming/issues/52)) ([6a60c56](https://github.com/taoq-ai/wuming/commit/6a60c56b9cc6e87f9b16fcd2e3b96248ea682d68))
+* **main:** release 0.3.2 ([#54](https://github.com/taoq-ai/wuming/issues/54)) ([f37769b](https://github.com/taoq-ai/wuming/commit/f37769bd2b43a6f89a11751f5b4c8e9977babb8e))
+* **main:** release 0.3.3 ([#56](https://github.com/taoq-ai/wuming/issues/56)) ([358ecfb](https://github.com/taoq-ai/wuming/commit/358ecfbb3b85f385855c990161eedfee5fc0a23c))
+* **main:** release 0.3.4 ([#59](https://github.com/taoq-ai/wuming/issues/59)) ([b4d604f](https://github.com/taoq-ai/wuming/commit/b4d604fe0000b2e71b3ef4569263c089753d19c3))
+* remove release-as now that v0.1.0 is published ([#39](https://github.com/taoq-ai/wuming/issues/39)) ([c51aa5a](https://github.com/taoq-ai/wuming/commit/c51aa5afb2e1132c25ac71571a24b9a0b4b6561f))
+
 ## [0.3.4](https://github.com/taoq-ai/wuming/compare/v0.3.3...v0.3.4) (2026-03-19)
 
 
