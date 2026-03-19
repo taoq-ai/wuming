@@ -20,8 +20,8 @@ type stubDetector struct {
 func (s *stubDetector) Detect(_ context.Context, _ string) ([]model.Match, error) {
 	return s.matches, nil
 }
-func (s *stubDetector) Name() string            { return s.name }
-func (s *stubDetector) Locales() []string        { return s.locales }
+func (s *stubDetector) Name() string              { return s.name }
+func (s *stubDetector) Locales() []string         { return s.locales }
 func (s *stubDetector) PIITypes() []model.PIIType { return s.types }
 
 func TestEngineProcess(t *testing.T) {

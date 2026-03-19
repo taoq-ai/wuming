@@ -13,12 +13,12 @@ import (
 
 // Engine orchestrates PII detection and replacement.
 type Engine struct {
-	detectors            []port.Detector
-	replacer             port.Replacer
-	locales              map[string]bool
-	piiTypes             map[model.PIIType]bool
-	concurrency          int
-	confidenceThreshold  float64
+	detectors           []port.Detector
+	replacer            port.Replacer
+	locales             map[string]bool
+	piiTypes            map[model.PIIType]bool
+	concurrency         int
+	confidenceThreshold float64
 }
 
 // Option configures an Engine.

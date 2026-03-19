@@ -6,7 +6,7 @@ type PIIType int
 
 const (
 	// Global patterns.
-	Email      PIIType = iota + 1
+	Email PIIType = iota + 1
 	Phone
 	CreditCard
 	IBAN
