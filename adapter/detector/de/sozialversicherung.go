@@ -20,9 +20,11 @@ func NewSozialversicherungDetector() *SozialversicherungDetector {
 	return &SozialversicherungDetector{}
 }
 
-func (d *SozialversicherungDetector) Name() string              { return "de/sozialversicherung" }
-func (d *SozialversicherungDetector) Locales() []string         { return []string{locale} }
-func (d *SozialversicherungDetector) PIITypes() []model.PIIType { return []model.PIIType{model.NationalID} }
+func (d *SozialversicherungDetector) Name() string      { return "de/sozialversicherung" }
+func (d *SozialversicherungDetector) Locales() []string { return []string{locale} }
+func (d *SozialversicherungDetector) PIITypes() []model.PIIType {
+	return []model.PIIType{model.NationalID}
+}
 
 func (d *SozialversicherungDetector) Detect(_ context.Context, text string) ([]model.Match, error) {
 	results := svnRe.FindAllStringIndex(text, -1)
