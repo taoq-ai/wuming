@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/taoq-ai/wuming/compare/v0.7.0...v0.8.0) (2026-03-19)
+
+
+### Features
+
+* add Brazil PII detectors — CPF, CNPJ, phone, CEP, PIS, CNH ([#70](https://github.com/taoq-ai/wuming/issues/70)) ([c4b7b1d](https://github.com/taoq-ai/wuming/commit/c4b7b1d4025e9d0feadde55f6247f877647ba44b))
+
 ## [0.7.0](https://github.com/taoq-ai/wuming/compare/v0.6.0...v0.7.0) (2026-03-19)
 
 
