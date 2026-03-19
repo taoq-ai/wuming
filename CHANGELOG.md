@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/taoq-ai/wuming/compare/v0.3.0...v0.3.1) (2026-03-19)
+
+
+### Documentation
+
+* add CITATION.cff for academic citation ([#51](https://github.com/taoq-ai/wuming/issues/51)) ([c6ad237](https://github.com/taoq-ai/wuming/commit/c6ad237a93f2d5a7fc177ccbc11cd0d650e0045a))
+
 ## [0.3.0](https://github.com/taoq-ai/wuming/compare/v0.2.0...v0.3.0) (2026-03-19)
 
 
