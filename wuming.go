@@ -19,6 +19,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/taoq-ai/wuming/adapter/preset"
 	"github.com/taoq-ai/wuming/adapter/registry"
 	"github.com/taoq-ai/wuming/adapter/replacer"
 	"github.com/taoq-ai/wuming/domain/model"
@@ -84,6 +85,34 @@ func WithConcurrency(n int) Option {
 func WithConfidenceThreshold(f float64) Option {
 	return func(c *config) {
 		c.confidenceThreshold = f
+	}
+}
+
+// WithPreset configures the instance for a specific compliance regulation
+// (e.g. "gdpr", "hipaa", "pci-dss"). It sets the appropriate locales, PII
+// types, and detectors based on the preset definition. Returns an error-
+// capturing option: if the preset name is unknown the resulting Wuming will
+// be nil and New will panic. Callers should validate names with preset.Get
+// or preset.List beforehand if unsure.
+func WithPreset(name string) Option {
+	return func(c *config) {
+		p, err := preset.Get(name)
+		if err != nil {
+			panic(err)
+		}
+
+		// Collect detectors for each locale in the preset.
+		seen := make(map[string]bool)
+		for _, locale := range p.Locales {
+			if seen[locale] {
+				continue
+			}
+			seen[locale] = true
+			c.detectors = append(c.detectors, registry.DetectorsForLocale(locale)...)
+			c.locales = append(c.locales, locale)
+		}
+
+		c.piiTypes = append(c.piiTypes, p.PIITypes...)
 	}
 }
 
