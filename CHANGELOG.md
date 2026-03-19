@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/taoq-ai/wuming/compare/v0.3.2...v0.3.3) (2026-03-19)
+
+
+### Documentation
+
+* add MkDocs site with Material theme and GitHub Pages deployment ([#55](https://github.com/taoq-ai/wuming/issues/55)) ([0bd2a41](https://github.com/taoq-ai/wuming/commit/0bd2a41a9e9e36d10fb021fab5f4faae33a48faa))
+
 ## [0.3.2](https://github.com/taoq-ai/wuming/compare/v0.3.1...v0.3.2) (2026-03-19)
 
 
