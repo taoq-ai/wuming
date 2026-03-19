@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/taoq-ai/wuming/compare/v0.3.1...v0.3.2) (2026-03-19)
+
+
+### Documentation
+
+* add README, CONTRIBUTING, ARCHITECTURE, SECURITY, and examples ([#53](https://github.com/taoq-ai/wuming/issues/53)) ([87e37bc](https://github.com/taoq-ai/wuming/commit/87e37bc74d898fd8588e7368d6493e3a5c5fffd2))
+
 ## [0.3.1](https://github.com/taoq-ai/wuming/compare/v0.3.0...v0.3.1) (2026-03-19)
 
 
