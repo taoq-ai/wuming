@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/taoq-ai/wuming/compare/v0.5.0...v0.6.0) (2026-03-19)
+
+
+### Features
+
+* add Japan PII detectors — My Number, Corporate Number, phone, postal, passport ([#63](https://github.com/taoq-ai/wuming/issues/63)) ([6072100](https://github.com/taoq-ai/wuming/commit/6072100884eebdb012a36b5e78a2365f07a8c868))
+
 ## [0.5.0](https://github.com/taoq-ai/wuming/compare/v0.4.0...v0.5.0) (2026-03-19)
 
 
