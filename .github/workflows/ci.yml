@@ -99,41 +99,77 @@ jobs:
           path: benchmark-results.txt
           retention-days: 30
 
+  benchmark-run:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        ref: [base, head]
+        suite:
+          - name: root
+            path: .
+          - name: detectors
+            path: ./adapter/detector/...
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout base ref
+        if: matrix.ref == 'base'
+        run: git checkout ${{ github.event.pull_request.base.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Run benchmarks
+        run: go test -bench=. -benchmem -count=3 -run='^$' -short ${{ matrix.suite.path }} > results.txt
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-${{ matrix.ref }}-${{ matrix.suite.name }}
+          path: results.txt
+          retention-days: 1
+
   benchmark-compare:
     runs-on: ubuntu-latest
+    needs: benchmark-run
     if: github.event_name == 'pull_request'
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
           go-version: "1.23"
       - name: Install benchstat
         run: go install golang.org/x/perf/cmd/benchstat@latest
-      - name: Run benchmarks on PR
-        run: go test -bench=. -benchmem -count=5 -run='^$' ./... > new.txt
-      - name: Run benchmarks on base
+      - name: Download all benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bench-*
+      - name: Compare benchmarks
         run: |
-          git checkout ${{ github.event.pull_request.base.sha }}
-          go test -bench=. -benchmem -count=5 -run='^$' ./... > old.txt
-          git checkout ${{ github.event.pull_request.head.sha }}
-      - name: Compare with benchstat
-        run: benchstat old.txt new.txt | tee benchstat.txt
+          echo "## Benchmark Comparison" > comment.md
+          for suite in root detectors; do
+            if [ -f "bench-base-${suite}/results.txt" ] && [ -f "bench-head-${suite}/results.txt" ]; then
+              echo "" >> comment.md
+              echo "### Suite: ${suite}" >> comment.md
+              echo '```' >> comment.md
+              benchstat "bench-base-${suite}/results.txt" "bench-head-${suite}/results.txt" >> comment.md 2>&1 || true
+              echo '```' >> comment.md
+            fi
+          done
+          cat comment.md
       - name: Comment on PR
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('benchstat.txt', 'utf8');
+            const body = fs.readFileSync('comment.md', 'utf8');
             if (body.trim()) {
               github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: '## Benchmark Comparison\n```\n' + body + '\n```'
+                body: body
               });
             }
