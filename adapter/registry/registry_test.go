@@ -59,7 +59,7 @@ func TestDetectorsForLocaleUnknown(t *testing.T) {
 
 func TestLocales(t *testing.T) {
 	locales := Locales()
-	expected := []string{"common", "de", "eu", "fr", "gb", "nl", "us"}
+	expected := []string{"common", "de", "eu", "fr", "gb", "jp", "nl", "us"}
 	if len(locales) != len(expected) {
 		t.Fatalf("Locales() = %v, want %v", locales, expected)
 	}
