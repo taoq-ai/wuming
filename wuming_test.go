@@ -118,6 +118,66 @@ func TestPackageLevelDetect(t *testing.T) {
 	}
 }
 
+func TestWithPresetGDPR(t *testing.T) {
+	w := New(WithPreset("gdpr"))
+	// GDPR should detect email (common locale).
+	text := "Email john@example.com"
+	result, err := w.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.MatchCount == 0 {
+		t.Error("WithPreset(\"gdpr\") should detect PII, but found no matches")
+	}
+}
+
+func TestWithPresetHIPAA(t *testing.T) {
+	w := New(WithPreset("hipaa"))
+	// HIPAA should detect SSN (us locale, NationalID type).
+	text := "SSN: 078-05-1120"
+	result, err := w.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hasNationalID := false
+	for _, m := range result.Matches {
+		if m.Type == model.NationalID {
+			hasNationalID = true
+		}
+	}
+	if !hasNationalID {
+		t.Error("WithPreset(\"hipaa\") should detect NationalID (SSN)")
+	}
+}
+
+func TestWithPresetPCIDSS(t *testing.T) {
+	w := New(WithPreset("pci-dss"))
+	// PCI-DSS should detect credit cards.
+	text := "Card: 4111 1111 1111 1111"
+	result, err := w.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hasCreditCard := false
+	for _, m := range result.Matches {
+		if m.Type == model.CreditCard {
+			hasCreditCard = true
+		}
+	}
+	if !hasCreditCard {
+		t.Error("WithPreset(\"pci-dss\") should detect CreditCard")
+	}
+}
+
+func TestWithPresetUnknownPanics(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("WithPreset(\"nonexistent\") should panic")
+		}
+	}()
+	New(WithPreset("nonexistent"))
+}
+
 func TestWithLocaleFilters(t *testing.T) {
 	w := New(WithLocale("nl"))
 	// BSN should be detected, SSN should not (US-specific).
