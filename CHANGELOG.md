@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/taoq-ai/wuming/compare/v0.8.0...v0.9.0) (2026-03-19)
+
+
+### Features
+
+* add compliance presets — GDPR, HIPAA, PCI-DSS, LGPD, APPI, PIPL, PIPA, DPDP, PIPEDA, Privacy Act ([#74](https://github.com/taoq-ai/wuming/issues/74)) ([dbbe4ec](https://github.com/taoq-ai/wuming/commit/dbbe4ec7b60bf09c53415cf76dd9097f63a266ee))
+
 ## [0.8.0](https://github.com/taoq-ai/wuming/compare/v0.7.0...v0.8.0) (2026-03-19)
 
 
