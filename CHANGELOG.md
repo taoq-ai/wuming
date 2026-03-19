@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.0](https://github.com/taoq-ai/wuming/compare/v0.1.0...v0.2.0) (2026-03-19)
+
+
+### Features
+
+* add common/global PII detectors — email, credit card, IP, URL, IBAN, MAC ([#40](https://github.com/taoq-ai/wuming/issues/40)) ([d9eb141](https://github.com/taoq-ai/wuming/commit/d9eb141e752a5984000d5e98a83701d7c0eb1d9e)), closes [#7](https://github.com/taoq-ai/wuming/issues/7)
+* add US PII detectors — SSN, EIN, phone, ZIP, passport, ITIN, Medicare ([#41](https://github.com/taoq-ai/wuming/issues/41)) ([cc8ac96](https://github.com/taoq-ai/wuming/commit/cc8ac96dfa3c89913e11aca43c65297c59c55082)), closes [#8](https://github.com/taoq-ai/wuming/issues/8)
+
+
+### Bug Fixes
+
+* remove bump-patch-for-minor-pre-major so feat: bumps minor ([#43](https://github.com/taoq-ai/wuming/issues/43)) ([3322dc8](https://github.com/taoq-ai/wuming/commit/3322dc812481fa9ab4146a79f86e0a1394c8a292))
+
+
+### Miscellaneous
+
+* remove release-as now that v0.1.0 is published ([#39](https://github.com/taoq-ai/wuming/issues/39)) ([c51aa5a](https://github.com/taoq-ai/wuming/commit/c51aa5afb2e1132c25ac71571a24b9a0b4b6561f))
+
 ## 0.1.0 (2026-03-19)
 
 
