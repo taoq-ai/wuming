@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/taoq-ai/wuming/compare/v0.2.0...v0.3.0) (2026-03-19)
+
+
+### Features
+
+* add EU-wide PII detectors — VAT ID, passport MRZ ([#45](https://github.com/taoq-ai/wuming/issues/45)) ([b9b40ac](https://github.com/taoq-ai/wuming/commit/b9b40ac7d795a8e7b57fd48f6474d07a71a2b47a))
+* add France PII detectors — NIR, NIF, phone, code postal, CNI ([#49](https://github.com/taoq-ai/wuming/issues/49)) ([888787e](https://github.com/taoq-ai/wuming/commit/888787e3271cc06a76e5789c70cddca8fcbf217f))
+* add Germany PII detectors — ID card, Steuer-ID, phone, PLZ ([#50](https://github.com/taoq-ai/wuming/issues/50)) ([8a12f55](https://github.com/taoq-ai/wuming/commit/8a12f55a6e8c869b1ebe1d0daefffa94c60737b1))
+* add Netherlands PII detectors — BSN, phone, postal code, KvK, Dutch ID ([#48](https://github.com/taoq-ai/wuming/issues/48)) ([b243fa7](https://github.com/taoq-ai/wuming/commit/b243fa7ebf5a1b341c3aab47a98de05727508a50))
+* add UK PII detectors — NIN, NHS, phone, postcode, UTR ([#46](https://github.com/taoq-ai/wuming/issues/46)) ([1890580](https://github.com/taoq-ai/wuming/commit/18905803fa1d89055e859ee0337a727b4afaa8e6))
+
 ## [0.2.0](https://github.com/taoq-ai/wuming/compare/v0.1.0...v0.2.0) (2026-03-19)
 
 
