@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/taoq-ai/wuming/compare/v0.4.0...v0.5.0) (2026-03-19)
+
+
+### Features
+
+* add detector registry with zero-config defaults and package-level convenience functions ([#61](https://github.com/taoq-ai/wuming/issues/61)) ([7acb435](https://github.com/taoq-ai/wuming/commit/7acb4352a91fd58a21fcd1804ea2218cfbac22cf))
+
 ## [0.4.0](https://github.com/taoq-ai/wuming/compare/v0.3.4...v0.4.0) (2026-03-19)
 
 
