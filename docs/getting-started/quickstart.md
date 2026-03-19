@@ -2,9 +2,35 @@
 
 This guide walks through the most common usage patterns for wuming.
 
-## Basic Usage
+## Zero-Config (Recommended)
 
-The simplest way to use wuming is with the default configuration, which loads all available detectors and uses the redact replacer:
+The fastest way to get started — a single function call that uses all available detectors:
+
+```go
+ctx := context.Background()
+
+// One-liner: detect and redact all PII.
+redacted, err := wuming.Redact(ctx, "SSN 123-45-6789, email john@acme.com")
+// redacted: "SSN [NATIONAL_ID], email [EMAIL]"
+```
+
+You can also get match details:
+
+```go
+matches, err := wuming.Detect(ctx, "BSN 123456782, call 06-12345678")
+// matches contains all detected PII with type, confidence, position
+```
+
+Or the full result:
+
+```go
+result, err := wuming.Process(ctx, text)
+// result.Original, result.Redacted, result.Matches, result.MatchCount
+```
+
+## Custom Instance
+
+Create a configured instance for more control:
 
 ```go
 w := wuming.New()

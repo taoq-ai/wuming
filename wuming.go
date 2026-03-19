@@ -17,7 +17,9 @@ package wuming
 
 import (
 	"context"
+	"sync"
 
+	"github.com/taoq-ai/wuming/adapter/registry"
 	"github.com/taoq-ai/wuming/adapter/replacer"
 	"github.com/taoq-ai/wuming/domain/model"
 	"github.com/taoq-ai/wuming/domain/port"
@@ -92,6 +94,11 @@ func New(opts ...Option) *Wuming {
 		opt(cfg)
 	}
 
+	// Default to all detectors if none explicitly provided.
+	if len(cfg.detectors) == 0 {
+		cfg.detectors = registry.AllDetectors()
+	}
+
 	// Default replacer.
 	if cfg.replacer == nil {
 		cfg.replacer = replacer.NewRedact()
@@ -139,4 +146,32 @@ func (w *Wuming) Redact(ctx context.Context, text string) (string, error) {
 		return "", err
 	}
 	return result.Redacted, nil
+}
+
+// defaultInstance is lazily initialized with all detectors.
+var (
+	defaultOnce     sync.Once
+	defaultInstance *Wuming
+)
+
+func getDefault() *Wuming {
+	defaultOnce.Do(func() {
+		defaultInstance = New()
+	})
+	return defaultInstance
+}
+
+// Redact detects and redacts all PII from text using all available detectors.
+func Redact(ctx context.Context, text string) (string, error) {
+	return getDefault().Redact(ctx, text)
+}
+
+// Detect finds all PII matches in text using all available detectors.
+func Detect(ctx context.Context, text string) ([]model.Match, error) {
+	return getDefault().Detect(ctx, text)
+}
+
+// Process runs full PII detection and replacement using all available detectors.
+func Process(ctx context.Context, text string) (*port.Result, error) {
+	return getDefault().Process(ctx, text)
 }

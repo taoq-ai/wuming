@@ -31,25 +31,26 @@ import (
     "log"
 
     "github.com/taoq-ai/wuming"
-    "github.com/taoq-ai/wuming/adapter/detector/common"
-    "github.com/taoq-ai/wuming/adapter/detector/nl"
 )
 
 func main() {
-    w := wuming.New(
-        wuming.WithDetectors(
-            common.NewEmailDetector(),
-            nl.NewPhoneDetector(),
-        ),
-    )
+    ctx := context.Background()
 
-    result, err := w.Process(context.Background(), "Call me at 06-12345678 or email john@example.com")
+    // Zero config — one line, catches everything.
+    redacted, err := wuming.Redact(ctx, "SSN 123-45-6789, email john@acme.com")
     if err != nil {
         log.Fatal(err)
     }
+    fmt.Println(redacted)
+    // Output: SSN [NATIONAL_ID], email [EMAIL]
 
+    // Locale-specific — only Dutch + common detectors.
+    w := wuming.New(wuming.WithLocale("nl"))
+    result, err := w.Process(ctx, "BSN 123456782, call 06-12345678")
+    if err != nil {
+        log.Fatal(err)
+    }
     fmt.Println(result.Redacted)
-    // Output: Call me at [PHONE] or email [EMAIL]
 }
 ```
 
