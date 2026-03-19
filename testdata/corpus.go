@@ -39,7 +39,7 @@ func LoadNegative(filename string) ([]TestCase, error) {
 }
 
 func loadJSON(path string) ([]TestCase, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // #nosec G304 -- paths are constructed from compile-time test fixtures
 	if err != nil {
 		return nil, err
 	}
