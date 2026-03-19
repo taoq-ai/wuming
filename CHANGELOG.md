@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/taoq-ai/wuming/compare/v0.9.0...v0.9.1) (2026-03-19)
+
+
+### Documentation
+
+* update README and docs for all 14 locales, presets, and zero-config API ([#78](https://github.com/taoq-ai/wuming/issues/78)) ([9dc9d22](https://github.com/taoq-ai/wuming/commit/9dc9d2261f7e3289fd66111770de85dfe664a16a))
+
 ## [0.9.0](https://github.com/taoq-ai/wuming/compare/v0.8.0...v0.9.0) (2026-03-19)
 
 
