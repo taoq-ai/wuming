@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/taoq-ai/wuming/compare/v0.9.1...v0.10.0) (2026-03-19)
+
+
+### Features
+
+* add EU AI Act compliance preset for training data governance ([#81](https://github.com/taoq-ai/wuming/issues/81)) ([6e9d118](https://github.com/taoq-ai/wuming/commit/6e9d118d804c52b42cc3c2499e35aa71d4bc5a9c))
+
 ## [0.9.1](https://github.com/taoq-ai/wuming/compare/v0.9.0...v0.9.1) (2026-03-19)
 
 
