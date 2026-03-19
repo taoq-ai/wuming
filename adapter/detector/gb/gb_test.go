@@ -2,6 +2,7 @@ package gb
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/taoq-ai/wuming/domain/model"
@@ -208,7 +209,7 @@ func TestPostcodeDetector(t *testing.T) {
 				t.Errorf("expected PostalCode type, got %v", m.Type)
 			}
 			// Value should be normalized to uppercase.
-			if m.Value != m.Value {
+			if m.Value != strings.ToUpper(m.Value) {
 				t.Errorf("value should be uppercase, got %q", m.Value)
 			}
 		}
