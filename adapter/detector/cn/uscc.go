@@ -9,7 +9,7 @@ import (
 )
 
 // Unified Social Credit Code (统一社会信用代码): 18 characters.
-// 2-char registration management department + 6-digit area code + 9-char organisation code + 1 check char.
+// 2-char registration management department + 6-digit area code + 9-char organization code + 1 check char.
 // Valid characters: digits and uppercase letters excluding I, O, S, V, Z.
 var usccRe = regexp.MustCompile(`\b[0-9A-HJ-NP-RTUW-Y]{2}\d{6}[0-9A-HJ-NP-RTUW-Y]{10}\b`)
 
