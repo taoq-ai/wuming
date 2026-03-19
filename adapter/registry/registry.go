@@ -5,6 +5,7 @@ package registry
 import (
 	"sort"
 
+	"github.com/taoq-ai/wuming/adapter/detector/au"
 	"github.com/taoq-ai/wuming/adapter/detector/common"
 	"github.com/taoq-ai/wuming/adapter/detector/de"
 	"github.com/taoq-ai/wuming/adapter/detector/eu"
@@ -19,15 +20,16 @@ import (
 
 // localeProviders maps locale names to their All() functions.
 var localeProviders = map[string]func() []port.Detector{
+	"au":     au.All,
 	"common": common.All,
-	"us":     us.All,
-	"nl":     nl.All,
-	"eu":     eu.All,
-	"gb":     gb.All,
-	"kr":     kr.All,
 	"de":     de.All,
+	"eu":     eu.All,
 	"fr":     fr.All,
+	"gb":     gb.All,
 	"jp":     jp.All,
+	"kr":     kr.All,
+	"nl":     nl.All,
+	"us":     us.All,
 }
 
 // AllDetectors returns every registered PII detector across all locales.
