@@ -36,8 +36,6 @@ var (
 		{2, 7, 9, 3, 8, 0, 6, 4, 1, 5},
 		{7, 0, 4, 6, 9, 1, 3, 2, 5, 8},
 	}
-
-	verhoeffInverse = [10]int{0, 4, 3, 2, 1, 5, 6, 7, 8, 9}
 )
 
 // verhoeffChecksum returns true if the digit string passes the Verhoeff check.
