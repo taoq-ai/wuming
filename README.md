@@ -8,19 +8,25 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/taoq-ai/wuming)](https://goreportcard.com/report/github.com/taoq-ai/wuming)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/taoq-ai/wuming/actions/workflows/ci.yml/badge.svg)](https://github.com/taoq-ai/wuming/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-TBD-yellowgreen)](https://github.com/taoq-ai/wuming)
 
 ---
 
 ## Features
 
+- **Zero-config detection** — a single function call catches all PII globally, no setup required
+- **Global coverage** — 14 locales, 75+ detectors spanning every major region (Americas, Europe, Asia-Pacific)
+- **10 compliance presets** — preconfigured profiles for GDPR, HIPAA, PCI-DSS, LGPD, APPI, PIPL, PIPA, DPDP, PIPEDA, and Privacy Act
+- **Locale-aware registry** — filter detectors with `WithLocale()` so only relevant patterns run
 - **Hexagonal architecture** — clean separation between domain logic, ports, and adapters
-- **Global coverage** — detectors for common patterns (email, credit card, IBAN) plus locale-specific PII (US SSN, Dutch BSN, UK NIN, German Steuer-ID, French NIR, EU VAT)
 - **Pluggable replacers** — redact, mask, hash, or bring your own replacement strategy
 - **Concurrent detection** — run multiple detectors in parallel with configurable concurrency
 - **Confidence scoring** — every match includes a confidence score; filter by threshold
 - **Zero dependencies** — pure Go standard library, no external modules
 
 ## Quick Start
+
+### Zero-Config (catches everything)
 
 ```go
 package main
@@ -43,15 +49,23 @@ func main() {
     }
     fmt.Println(redacted)
     // Output: SSN [NATIONAL_ID], email [EMAIL]
-
-    // Locale-specific — only Dutch + common detectors.
-    w := wuming.New(wuming.WithLocale("nl"))
-    result, err := w.Process(ctx, "BSN 123456782, call 06-12345678")
-    if err != nil {
-        log.Fatal(err)
-    }
-    fmt.Println(result.Redacted)
 }
+```
+
+### Compliance Preset
+
+```go
+// Configure for GDPR compliance — only EU/EEA locales and PII types.
+w := wuming.New(wuming.WithPreset("gdpr"))
+result, err := w.Process(ctx, "Steuer-ID 12345678911, email jan@example.de")
+```
+
+### Locale-Specific
+
+```go
+// Only Dutch + common detectors.
+w := wuming.New(wuming.WithLocale("nl"))
+result, err := w.Process(ctx, "BSN 123456782, call 06-12345678")
 ```
 
 ## Installation
@@ -73,6 +87,35 @@ Requires **Go 1.22** or later.
 | gb       | `adapter/detector/gb`            | NIN, NHS Number, UTR, Phone, Postcode                     |
 | de       | `adapter/detector/de`            | Steuer-ID, Sozialversicherungsnummer, Phone, PLZ, ID Card |
 | fr       | `adapter/detector/fr`            | NIR, NIF, Phone, Postal Code, ID Card                     |
+| br       | `adapter/detector/br`            | CPF, CNPJ, Phone, CEP, PIS/PASEP, CNH                    |
+| jp       | `adapter/detector/jp`            | My Number, Corporate Number, Phone, Postal Code, Passport |
+| in       | `adapter/detector/in`            | Aadhaar, PAN, Phone, PIN Code, Passport, GSTIN            |
+| cn       | `adapter/detector/cn`            | Resident ID, Phone, Postal Code, Passport, USCC           |
+| kr       | `adapter/detector/kr`            | RRN, Phone, Postal Code, Passport                         |
+| au       | `adapter/detector/au`            | TFN, Medicare, ABN, Phone, Postcode                       |
+| ca       | `adapter/detector/ca`            | SIN, Phone, Postal Code, Passport                         |
+
+## Compliance Presets
+
+Presets bundle the right locales and PII types for a specific regulation. Use them to get compliant detection without manual configuration.
+
+| Preset        | Regulation                                               | Locales                        |
+|---------------|----------------------------------------------------------|--------------------------------|
+| `gdpr`        | EU General Data Protection Regulation                    | common, eu, nl, de, fr, gb     |
+| `hipaa`       | US Health Insurance Portability and Accountability Act   | common, us                     |
+| `pci-dss`     | Payment Card Industry Data Security Standard             | common                         |
+| `lgpd`        | Brazil Lei Geral de Protecao de Dados                    | common, br                     |
+| `appi`        | Japan Act on the Protection of Personal Information      | common, jp                     |
+| `pipl`        | China Personal Information Protection Law                | common, cn                     |
+| `pipa`        | South Korea Personal Information Protection Act          | common, kr                     |
+| `dpdp`        | India Digital Personal Data Protection Act               | common, in                     |
+| `pipeda`      | Canada Personal Information Protection and Electronic Documents Act | common, ca          |
+| `privacy-act` | Australia Privacy Act                                    | common, au                     |
+
+```go
+w := wuming.New(wuming.WithPreset("gdpr"))
+result, err := w.Process(ctx, text)
+```
 
 ## Replacer Strategies
 
@@ -112,6 +155,8 @@ Wuming follows a hexagonal (ports & adapters) architecture:
 ├──────────┼──────────────────────────┤
 │ Adapters │  adapter/detector/{loc}  │
 │          │  adapter/replacer/       │
+│          │  adapter/preset/         │
+│          │  adapter/registry/       │
 └──────────┴──────────────────────────┘
 ```
 

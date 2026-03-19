@@ -28,6 +28,26 @@ result, err := wuming.Process(ctx, text)
 // result.Original, result.Redacted, result.Matches, result.MatchCount
 ```
 
+## Compliance Preset
+
+Use a preset to configure detection for a specific regulation. The preset automatically selects the right locales and PII types:
+
+```go
+// GDPR — EU/EEA personal data
+w := wuming.New(wuming.WithPreset("gdpr"))
+result, err := w.Process(ctx, "Steuer-ID 12345678911, email jan@example.de")
+
+// HIPAA — US protected health information
+w = wuming.New(wuming.WithPreset("hipaa"))
+result, err = w.Process(ctx, "SSN 123-45-6789, Medicare 1EG4-TE5-MK72")
+
+// PCI-DSS — credit card data only
+w = wuming.New(wuming.WithPreset("pci-dss"))
+result, err = w.Process(ctx, "Card: 4111-1111-1111-1111")
+```
+
+See [Compliance Presets](../presets.md) for all 10 available presets.
+
 ## Custom Instance
 
 Create a configured instance for more control:
