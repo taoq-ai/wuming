@@ -47,6 +47,14 @@ nav:
     - United Kingdom: detectors/gb.md
     - Germany: detectors/de.md
     - France: detectors/fr.md
+    - Brazil: detectors/br.md
+    - Japan: detectors/jp.md
+    - India: detectors/in.md
+    - China: detectors/cn.md
+    - South Korea: detectors/kr.md
+    - Australia: detectors/au.md
+    - Canada: detectors/ca.md
+  - Compliance Presets: presets.md
   - Replacers: replacers.md
   - Contributing: contributing.md
   - Changelog: changelog.md

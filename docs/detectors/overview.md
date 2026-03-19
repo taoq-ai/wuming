@@ -41,6 +41,41 @@ Detectors are the core building blocks of wuming. Each detector scans input text
 | FR | ID Card | NATIONAL_ID | 0.65 | Old (12-digit) + new (9-char) |
 | FR | Phone | PHONE | 0.85 | French format |
 | FR | Postal Code | POSTAL_CODE | 0.60 | Department prefix validation |
+| BR | CPF | NATIONAL_ID | 0.90 | Check digits |
+| BR | CNPJ | TAX_ID | 0.90 | Check digits |
+| BR | Phone | PHONE | 0.85 | Brazilian format |
+| BR | CEP | POSTAL_CODE | 0.60 | Regex |
+| BR | PIS/PASEP | NATIONAL_ID | 0.80 | Check digit |
+| BR | CNH | DRIVERS_LICENSE | 0.75 | Pattern matching |
+| JP | My Number | NATIONAL_ID | 0.90 | Check digit |
+| JP | Corporate Number | TAX_ID | 0.90 | Check digit |
+| JP | Phone | PHONE | 0.85 | Japanese format |
+| JP | Postal Code | POSTAL_CODE | 0.60 | Regex |
+| JP | Passport | PASSPORT | 0.60 | Regex |
+| IN | Aadhaar | NATIONAL_ID | 0.90 | Verhoeff checksum |
+| IN | PAN | TAX_ID | 0.85 | Pattern matching |
+| IN | Phone | PHONE | 0.85 | Indian format |
+| IN | PIN Code | POSTAL_CODE | 0.60 | Regex |
+| IN | Passport | PASSPORT | 0.60 | Regex |
+| IN | GSTIN | TAX_ID | 0.85 | Check digit |
+| CN | Resident ID | NATIONAL_ID | 0.90 | Check digit (GB 11643) |
+| CN | Phone | PHONE | 0.85 | Chinese format |
+| CN | Postal Code | POSTAL_CODE | 0.60 | Regex |
+| CN | Passport | PASSPORT | 0.60 | Regex |
+| CN | USCC | TAX_ID | 0.85 | Pattern matching |
+| KR | RRN | NATIONAL_ID | 0.90 | Check digit |
+| KR | Phone | PHONE | 0.85 | Korean format |
+| KR | Postal Code | POSTAL_CODE | 0.60 | Regex |
+| KR | Passport | PASSPORT | 0.60 | Regex |
+| AU | TFN | TAX_ID | 0.85 | Weighted checksum |
+| AU | Medicare | HEALTH_ID | 0.80 | Check digit |
+| AU | ABN | TAX_ID | 0.85 | Weighted checksum |
+| AU | Phone | PHONE | 0.85 | Australian format |
+| AU | Postcode | POSTAL_CODE | 0.60 | Regex |
+| CA | SIN | NATIONAL_ID | 0.90 | Luhn check digit |
+| CA | Phone | PHONE | 0.85 | NANP format |
+| CA | Postal Code | POSTAL_CODE | 0.60 | Canadian format |
+| CA | Passport | PASSPORT | 0.60 | Regex |
 
 ## The Detector Interface
 
