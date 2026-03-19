@@ -91,7 +91,7 @@ jobs:
         with:
           go-version: "1.23"
       - name: Run benchmarks
-        run: go test -bench=. -benchmem -run='^$' -count=1 ./... | tee benchmark-results.txt
+        run: go test -bench=. -benchmem -short -run='^$' -count=1 ./... | tee benchmark-results.txt
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
