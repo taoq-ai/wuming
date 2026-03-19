@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/taoq-ai/wuming/adapter/detector/au"
+	"github.com/taoq-ai/wuming/adapter/detector/br"
 	"github.com/taoq-ai/wuming/adapter/detector/ca"
 	"github.com/taoq-ai/wuming/adapter/detector/cn"
 	"github.com/taoq-ai/wuming/adapter/detector/common"
@@ -24,6 +25,7 @@ import (
 // localeProviders maps locale names to their All() functions.
 var localeProviders = map[string]func() []port.Detector{
 	"au":     au.All,
+	"br":     br.All,
 	"ca":     ca.All,
 	"cn":     cn.All,
 	"common": common.All,
