@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/taoq-ai/wuming/compare/v0.3.3...v0.3.4) (2026-03-19)
+
+
+### Bug Fixes
+
+* use fence_code_format for Mermaid in mkdocs.yml ([#58](https://github.com/taoq-ai/wuming/issues/58)) ([b38b3a9](https://github.com/taoq-ai/wuming/commit/b38b3a9eed1f9090ee7131e8a58426ae5d4303e6))
+
 ## [0.3.3](https://github.com/taoq-ai/wuming/compare/v0.3.2...v0.3.3) (2026-03-19)
 
 
