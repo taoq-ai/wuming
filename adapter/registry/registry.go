@@ -11,6 +11,7 @@ import (
 	"github.com/taoq-ai/wuming/adapter/detector/fr"
 	"github.com/taoq-ai/wuming/adapter/detector/gb"
 	"github.com/taoq-ai/wuming/adapter/detector/jp"
+	"github.com/taoq-ai/wuming/adapter/detector/kr"
 	"github.com/taoq-ai/wuming/adapter/detector/nl"
 	"github.com/taoq-ai/wuming/adapter/detector/us"
 	"github.com/taoq-ai/wuming/domain/port"
@@ -23,6 +24,7 @@ var localeProviders = map[string]func() []port.Detector{
 	"nl":     nl.All,
 	"eu":     eu.All,
 	"gb":     gb.All,
+	"kr":     kr.All,
 	"de":     de.All,
 	"fr":     fr.All,
 	"jp":     jp.All,
