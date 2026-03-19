@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.0](https://github.com/taoq-ai/wuming/compare/v0.6.0...v0.7.0) (2026-03-19)
+
+
+### Features
+
+* add Australia PII detectors — TFN, Medicare, ABN, phone, postcode ([#66](https://github.com/taoq-ai/wuming/issues/66)) ([e417efa](https://github.com/taoq-ai/wuming/commit/e417efa26101f54231a9d2e1157959114eb2c3bf))
+* add Canada PII detectors — SIN, phone, postal code, passport ([#69](https://github.com/taoq-ai/wuming/issues/69)) ([1744bb7](https://github.com/taoq-ai/wuming/commit/1744bb7020a8b40b0bc457f4ee037c2b9f6e3f50))
+* add China PII detectors ([#67](https://github.com/taoq-ai/wuming/issues/67)) ([7b805d3](https://github.com/taoq-ai/wuming/commit/7b805d309cde54f3af6c15ba60dccbe10582e05b))
+* add India PII detectors ([#68](https://github.com/taoq-ai/wuming/issues/68)) ([c3ec039](https://github.com/taoq-ai/wuming/commit/c3ec039f7a36d0f18fd0f9ce00fa149a0b2f5784))
+* add South Korea PII detectors — RRN, phone, postal, passport ([#64](https://github.com/taoq-ai/wuming/issues/64)) ([c7b7ec5](https://github.com/taoq-ai/wuming/commit/c7b7ec56d9f6199c65bf1c8f36749c765014713f))
+
 ## [0.6.0](https://github.com/taoq-ai/wuming/compare/v0.5.0...v0.6.0) (2026-03-19)
 
 
