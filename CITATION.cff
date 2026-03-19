@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "wuming: A Global PII Detection and Redaction Library"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - name: "taoq-ai"
+    website: "https://github.com/taoq-ai"
+repository-code: "https://github.com/taoq-ai/wuming"
+url: "https://taoq-ai.github.io/wuming"
+abstract: >-
+  wuming (无名, "The Nameless") is a Go library for detecting and removing
+  Personally Identifiable Information (PII) from text. It supports global
+  standards across multiple locales including US, EU, NL, GB, DE, FR, and
+  more, using a hexagonal architecture for extensibility and testability.
+keywords:
+  - PII
+  - deidentification
+  - privacy
+  - GDPR
+  - data-protection
+  - Go
+  - redaction
+  - anonymization
+license: MIT
+version: 0.2.0
+date-released: "2026-03-19"
