@@ -98,3 +98,42 @@ jobs:
           name: benchmark-results
           path: benchmark-results.txt
           retention-days: 30
+
+  benchmark-compare:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Install benchstat
+        run: go install golang.org/x/perf/cmd/benchstat@latest
+      - name: Run benchmarks on PR
+        run: go test -bench=. -benchmem -count=5 -run='^$' ./... > new.txt
+      - name: Run benchmarks on base
+        run: |
+          git checkout ${{ github.event.pull_request.base.sha }}
+          go test -bench=. -benchmem -count=5 -run='^$' ./... > old.txt
+          git checkout ${{ github.event.pull_request.head.sha }}
+      - name: Compare with benchstat
+        run: benchstat old.txt new.txt | tee benchstat.txt
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('benchstat.txt', 'utf8');
+            if (body.trim()) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## Benchmark Comparison\n```\n' + body + '\n```'
+              });
+            }
