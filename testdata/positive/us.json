@@ -1,0 +1,75 @@
+[
+  {
+    "input": "My SSN is 078-05-1120 and I need to update my records.",
+    "locale": "us",
+    "expected": [{"type": "NATIONAL_ID", "value": "078-05-1120"}],
+    "description": "SSN in standard format"
+  },
+  {
+    "input": "SSN 123456789 appears on the document",
+    "locale": "us",
+    "expected": [{"type": "NATIONAL_ID", "value": "123456789"}],
+    "description": "SSN without dashes"
+  },
+  {
+    "input": "Call (555) 123-4567 or +1-555-987-6543 for assistance.",
+    "locale": "us",
+    "expected": [
+      {"type": "PHONE", "value": "(555) 123-4567"},
+      {"type": "PHONE", "value": "+1-555-987-6543"}
+    ],
+    "description": "two US phone numbers in different formats"
+  },
+  {
+    "input": "Ship to ZIP 90210-1234, attention: warehouse",
+    "locale": "us",
+    "expected": [{"type": "POSTAL_CODE", "value": "90210-1234"}],
+    "description": "ZIP+4 code embedded in sentence"
+  },
+  {
+    "input": "ZIP code is 10001 for this address",
+    "locale": "us",
+    "expected": [{"type": "POSTAL_CODE", "value": "10001"}],
+    "description": "5-digit ZIP code"
+  },
+  {
+    "input": "EIN: 12-3456789 for tax filing",
+    "locale": "us",
+    "expected": [{"type": "TAX_ID", "value": "12-3456789"}],
+    "description": "EIN in sentence"
+  },
+  {
+    "input": "ITIN: 912-50-1234 assigned to the applicant",
+    "locale": "us",
+    "expected": [{"type": "TAX_ID", "value": "912-50-1234"}],
+    "description": "ITIN in standard format"
+  },
+  {
+    "input": "Passport C12345678 on file",
+    "locale": "us",
+    "expected": [{"type": "PASSPORT", "value": "C12345678"}],
+    "description": "US passport with letter prefix"
+  },
+  {
+    "input": "SSN 234-56-7890 on file",
+    "locale": "us",
+    "expected": [{"type": "NATIONAL_ID", "value": "234-56-7890"}],
+    "description": "standalone SSN"
+  },
+  {
+    "input": "MBI: 1EG4TE5MK72 for Medicare",
+    "locale": "us",
+    "expected": [{"type": "HEALTH_ID", "value": "1EG4TE5MK72"}],
+    "description": "Medicare Beneficiary Identifier"
+  },
+  {
+    "input": "078-05-1120 is the SSN and phone is 555.123.4567 and ZIP 90210",
+    "locale": "us",
+    "expected": [
+      {"type": "NATIONAL_ID", "value": "078-05-1120"},
+      {"type": "PHONE", "value": "555.123.4567"},
+      {"type": "POSTAL_CODE", "value": "90210"}
+    ],
+    "description": "multiple US PII types in one sentence"
+  }
+]

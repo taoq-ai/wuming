@@ -1,0 +1,116 @@
+[
+  {
+    "input": "The year 2024-01-15 is not a SSN",
+    "locale": "",
+    "expected": [],
+    "description": "date that resembles SSN format"
+  },
+  {
+    "input": "Product SKU 123-45-6789 from the catalog",
+    "locale": "",
+    "expected": [],
+    "description": "SKU number in SSN format but area 123 may match - context dependent"
+  },
+  {
+    "input": "Room 000-12-3456 is not a valid SSN",
+    "locale": "",
+    "expected": [],
+    "description": "number starting with 000 is invalid SSN"
+  },
+  {
+    "input": "Error code 666-45-6789 in the system",
+    "locale": "",
+    "expected": [],
+    "description": "number with area 666 is invalid SSN"
+  },
+  {
+    "input": "Version 1.2.3.4 of the software is released",
+    "locale": "",
+    "expected": [],
+    "description": "version number that might look like an IP"
+  },
+  {
+    "input": "The ratio is 999.999.999.999 to one",
+    "locale": "",
+    "expected": [],
+    "description": "large number with dots is not a valid IP (octets > 255)"
+  },
+  {
+    "input": "Reference number 1234567890123456 does not pass Luhn",
+    "locale": "",
+    "expected": [],
+    "description": "16-digit number that fails Luhn check"
+  },
+  {
+    "input": "Case ID NL00ABNA0000000000 has invalid checksum",
+    "locale": "",
+    "expected": [],
+    "description": "IBAN-like string with invalid checksum"
+  },
+  {
+    "input": "Temperature is 100 degrees and humidity is 50 percent",
+    "locale": "",
+    "expected": [],
+    "description": "plain numbers that are not PII"
+  },
+  {
+    "input": "The meeting is at 10:00 AM in room 42",
+    "locale": "",
+    "expected": [],
+    "description": "time and room number are not PII"
+  },
+  {
+    "input": "This is a completely normal sentence with no PII whatsoever.",
+    "locale": "",
+    "expected": [],
+    "description": "clean text with no PII"
+  },
+  {
+    "input": "",
+    "locale": "",
+    "expected": [],
+    "description": "empty string"
+  },
+  {
+    "input": "   ",
+    "locale": "",
+    "expected": [],
+    "description": "whitespace only"
+  },
+  {
+    "input": "Dutch postcode 1000 SA is excluded as valid postal code",
+    "locale": "nl",
+    "expected": [],
+    "description": "NL postal code with SA combination is explicitly excluded"
+  },
+  {
+    "input": "Postcode 0123 AB starts with zero and is invalid",
+    "locale": "nl",
+    "expected": [],
+    "description": "NL postal code starting with 0 is invalid"
+  },
+  {
+    "input": "BSN 000000000 is all zeros and invalid",
+    "locale": "nl",
+    "expected": [],
+    "description": "all-zero BSN fails 11-proof"
+  },
+  {
+    "input": "CPF 111.111.111-11 is all same digits",
+    "locale": "br",
+    "expected": [],
+    "description": "CPF with all same digits is invalid"
+  },
+  {
+    "input": "SSN 000-12-3456 starts with area 000",
+    "locale": "us",
+    "expected": [],
+    "description": "SSN with area 000 is invalid"
+  },
+  {
+    "input": "SSN 900-12-3456 has area 900+",
+    "locale": "us",
+    "expected": [],
+    "description": "SSN with area 900+ is invalid"
+  }
+]

@@ -1,0 +1,93 @@
+[
+  {
+    "input": "Please contact jane.doe@example.com for more information about the project.",
+    "locale": "common",
+    "expected": [{"type": "EMAIL", "value": "jane.doe@example.com"}],
+    "description": "email in sentence"
+  },
+  {
+    "input": "Send invoices to billing+dept@company.co.uk and cc admin@company.co.uk",
+    "locale": "common",
+    "expected": [
+      {"type": "EMAIL", "value": "billing+dept@company.co.uk"},
+      {"type": "EMAIL", "value": "admin@company.co.uk"}
+    ],
+    "description": "two emails with plus addressing and country TLD"
+  },
+  {
+    "input": "Card number: 4111 1111 1111 1111, expires 12/28",
+    "locale": "common",
+    "expected": [{"type": "CREDIT_CARD", "value": "4111 1111 1111 1111"}],
+    "description": "Visa credit card with spaces"
+  },
+  {
+    "input": "Pay with Amex 378282246310005 or Mastercard 5500000000000004",
+    "locale": "common",
+    "expected": [
+      {"type": "CREDIT_CARD", "value": "378282246310005"},
+      {"type": "CREDIT_CARD", "value": "5500000000000004"}
+    ],
+    "description": "two credit cards in one sentence"
+  },
+  {
+    "input": "Transfer to IBAN NL91ABNA0417164300 before Friday",
+    "locale": "common",
+    "expected": [{"type": "IBAN", "value": "NL91ABNA0417164300"}],
+    "description": "Dutch IBAN in sentence"
+  },
+  {
+    "input": "IBAN DE89370400440532013000 and GB29NWBK60161331926819 are on file",
+    "locale": "common",
+    "expected": [
+      {"type": "IBAN", "value": "DE89370400440532013000"},
+      {"type": "IBAN", "value": "GB29NWBK60161331926819"}
+    ],
+    "description": "two IBANs from different countries"
+  },
+  {
+    "input": "Server IP is 192.168.1.100 and the gateway is 10.0.0.1",
+    "locale": "common",
+    "expected": [
+      {"type": "IP_ADDRESS", "value": "192.168.1.100"},
+      {"type": "IP_ADDRESS", "value": "10.0.0.1"}
+    ],
+    "description": "two IPv4 addresses"
+  },
+  {
+    "input": "IPv6 address: 2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+    "locale": "common",
+    "expected": [{"type": "IP_ADDRESS", "value": "2001:0db8:85a3:0000:0000:8a2e:0370:7334"}],
+    "description": "IPv6 address in sentence"
+  },
+  {
+    "input": "Visit https://example.com/dashboard?user=42 for details",
+    "locale": "common",
+    "expected": [{"type": "URL", "value": "https://example.com/dashboard?user=42"}],
+    "description": "URL with query parameter"
+  },
+  {
+    "input": "See http://localhost:8080 and https://api.example.org/v2/data",
+    "locale": "common",
+    "expected": [
+      {"type": "URL", "value": "http://localhost:8080"},
+      {"type": "URL", "value": "https://api.example.org/v2/data"}
+    ],
+    "description": "two URLs in one sentence"
+  },
+  {
+    "input": "MAC address 00:1A:2B:3C:4D:5E is registered to the device",
+    "locale": "common",
+    "expected": [{"type": "MAC_ADDRESS", "value": "00:1A:2B:3C:4D:5E"}],
+    "description": "MAC address colon format"
+  },
+  {
+    "input": "Contact alice@test.org, card 6011111111111117, IP 172.16.0.1",
+    "locale": "common",
+    "expected": [
+      {"type": "EMAIL", "value": "alice@test.org"},
+      {"type": "CREDIT_CARD", "value": "6011111111111117"},
+      {"type": "IP_ADDRESS", "value": "172.16.0.1"}
+    ],
+    "description": "mixed PII types in one sentence"
+  }
+]

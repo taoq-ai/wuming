@@ -1,0 +1,75 @@
+[
+  {
+    "input": "CPF do cliente: 529.982.247-25 registrado no sistema",
+    "locale": "br",
+    "expected": [{"type": "TAX_ID", "value": "529.982.247-25"}],
+    "description": "formatted CPF in Portuguese text"
+  },
+  {
+    "input": "CPF 52998224725 sem formatacao",
+    "locale": "br",
+    "expected": [{"type": "TAX_ID", "value": "52998224725"}],
+    "description": "unformatted CPF"
+  },
+  {
+    "input": "CNPJ da empresa: 11.222.333/0001-81",
+    "locale": "br",
+    "expected": [{"type": "TAX_ID", "value": "11.222.333/0001-81"}],
+    "description": "formatted CNPJ"
+  },
+  {
+    "input": "CNPJ 11222333000181 no cadastro",
+    "locale": "br",
+    "expected": [{"type": "TAX_ID", "value": "11222333000181"}],
+    "description": "unformatted CNPJ"
+  },
+  {
+    "input": "Ligue para (11) 91234-5678 ou (21) 2345-6789",
+    "locale": "br",
+    "expected": [
+      {"type": "PHONE", "value": "(11) 91234-5678"},
+      {"type": "PHONE", "value": "(21) 2345-6789"}
+    ],
+    "description": "mobile and landline Brazilian phones"
+  },
+  {
+    "input": "Telefone: +55 11 91234-5678 celular",
+    "locale": "br",
+    "expected": [{"type": "PHONE", "value": "+55 11 91234-5678"}],
+    "description": "international format Brazilian phone"
+  },
+  {
+    "input": "CEP de entrega: 01001-000",
+    "locale": "br",
+    "expected": [{"type": "POSTAL_CODE", "value": "01001-000"}],
+    "description": "formatted CEP"
+  },
+  {
+    "input": "CEP 01001000 para correspondencia",
+    "locale": "br",
+    "expected": [{"type": "POSTAL_CODE", "value": "01001000"}],
+    "description": "unformatted CEP"
+  },
+  {
+    "input": "PIS: 123.45678.90-0 do funcionario",
+    "locale": "br",
+    "expected": [{"type": "NATIONAL_ID", "value": "123.45678.90-0"}],
+    "description": "PIS number formatted"
+  },
+  {
+    "input": "CNH: 50680454028 do motorista",
+    "locale": "br",
+    "expected": [{"type": "DRIVERS_LICENSE", "value": "50680454028"}],
+    "description": "CNH driver license number"
+  },
+  {
+    "input": "CPF 529.982.247-25, telefone (11) 91234-5678, CEP 01001-000",
+    "locale": "br",
+    "expected": [
+      {"type": "TAX_ID", "value": "529.982.247-25"},
+      {"type": "PHONE", "value": "(11) 91234-5678"},
+      {"type": "POSTAL_CODE", "value": "01001-000"}
+    ],
+    "description": "multiple BR PII types in one sentence"
+  }
+]

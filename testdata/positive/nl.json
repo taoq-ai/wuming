@@ -1,0 +1,63 @@
+[
+  {
+    "input": "BSN nummer: 111222333 staat in het dossier",
+    "locale": "nl",
+    "expected": [{"type": "NATIONAL_ID", "value": "111222333"}],
+    "description": "BSN plain format in Dutch text"
+  },
+  {
+    "input": "Het BSN is 123456782 van de client",
+    "locale": "nl",
+    "expected": [{"type": "NATIONAL_ID", "value": "123456782"}],
+    "description": "valid 11-proof BSN"
+  },
+  {
+    "input": "Bel 06-12345678 voor meer informatie",
+    "locale": "nl",
+    "expected": [{"type": "PHONE", "value": "06-12345678"}],
+    "description": "Dutch mobile phone with dash"
+  },
+  {
+    "input": "Bereikbaar op +31 6 12345678 of 020-1234567",
+    "locale": "nl",
+    "expected": [
+      {"type": "PHONE", "value": "+31 6 12345678"},
+      {"type": "PHONE", "value": "020-1234567"}
+    ],
+    "description": "international mobile and Amsterdam landline"
+  },
+  {
+    "input": "Postcode: 1234 AB, Amsterdam",
+    "locale": "nl",
+    "expected": [{"type": "POSTAL_CODE", "value": "1234 AB"}],
+    "description": "Dutch postal code with space"
+  },
+  {
+    "input": "Woonplaats 9999ZZ is geldig",
+    "locale": "nl",
+    "expected": [{"type": "POSTAL_CODE", "value": "9999ZZ"}],
+    "description": "Dutch postal code without space"
+  },
+  {
+    "input": "KvK nummer 12345678 voor het bedrijf",
+    "locale": "nl",
+    "expected": [{"type": "TAX_ID", "value": "12345678"}],
+    "description": "KvK number with prefix"
+  },
+  {
+    "input": "ID document: SPECI2014 op naam",
+    "locale": "nl",
+    "expected": [{"type": "NATIONAL_ID", "value": "SPECI2014"}],
+    "description": "Dutch ID card number"
+  },
+  {
+    "input": "BSN 111222333, postcode 2500 AA, telefoon 0612345678",
+    "locale": "nl",
+    "expected": [
+      {"type": "NATIONAL_ID", "value": "111222333"},
+      {"type": "POSTAL_CODE", "value": "2500 AA"},
+      {"type": "PHONE", "value": "0612345678"}
+    ],
+    "description": "multiple NL PII types in one sentence"
+  }
+]
