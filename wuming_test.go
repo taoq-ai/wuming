@@ -2,6 +2,7 @@ package wuming
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/taoq-ai/wuming/domain/model"
@@ -84,3 +85,63 @@ func TestWumingProcess(t *testing.T) {
 
 // Verify stub implements port.Detector.
 var _ port.Detector = (*stubDetector)(nil)
+
+func TestZeroConfigNew(t *testing.T) {
+	w := New()
+	text := "Email john@example.com and SSN 078-05-1120"
+	result, err := w.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.MatchCount == 0 {
+		t.Error("zero-config New() should detect PII, but found no matches")
+	}
+}
+
+func TestPackageLevelRedact(t *testing.T) {
+	got, err := Redact(context.Background(), "Email john@example.com please")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got == "Email john@example.com please" {
+		t.Error("package-level Redact() did not redact anything")
+	}
+}
+
+func TestPackageLevelDetect(t *testing.T) {
+	matches, err := Detect(context.Background(), "Email john@example.com please")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(matches) == 0 {
+		t.Error("package-level Detect() found no matches")
+	}
+}
+
+func TestWithLocaleFilters(t *testing.T) {
+	w := New(WithLocale("nl"))
+	// BSN should be detected, SSN should not (US-specific).
+	text := "BSN: 123456782, SSN: 078-05-1120"
+	result, err := w.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	hasNL := false
+	hasUS := false
+	for _, m := range result.Matches {
+		if strings.HasPrefix(m.Detector, "nl/") {
+			hasNL = true
+		}
+		if strings.HasPrefix(m.Detector, "us/") {
+			hasUS = true
+		}
+	}
+
+	if !hasNL {
+		t.Error("WithLocale(\"nl\") should detect NL PII")
+	}
+	if hasUS {
+		t.Error("WithLocale(\"nl\") should not detect US-specific PII")
+	}
+}
