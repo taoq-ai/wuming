@@ -168,5 +168,156 @@ func TestEngineNoReplacer(t *testing.T) {
 	}
 }
 
+func TestEngineAllowlist(t *testing.T) {
+	detector := &stubDetector{
+		name: "mixed",
+		matches: []model.Match{
+			{Type: model.Email, Value: "john@example.com", Start: 0, End: 16, Confidence: 1.0},
+			{Type: model.URL, Value: "example.com", Start: 20, End: 31, Confidence: 0.9},
+		},
+	}
+
+	e := New(
+		WithDetectors(detector),
+		WithReplacer(replacer.NewRedact()),
+		WithAllowlist("example.com"),
+	)
+
+	result, err := e.Process(context.Background(), "john@example.com or example.com here")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 1 {
+		t.Errorf("MatchCount = %d, want 1 (allowlisted value should be filtered)", result.MatchCount)
+	}
+	if result.Matches[0].Type != model.Email {
+		t.Errorf("remaining match type = %v, want Email", result.Matches[0].Type)
+	}
+}
+
+func TestEngineAllowlistCaseInsensitive(t *testing.T) {
+	detector := &stubDetector{
+		name: "url",
+		matches: []model.Match{
+			{Type: model.URL, Value: "Example.COM", Start: 0, End: 11, Confidence: 0.9},
+		},
+	}
+
+	e := New(
+		WithDetectors(detector),
+		WithReplacer(replacer.NewRedact()),
+		WithAllowlist("example.com"),
+	)
+
+	result, err := e.Process(context.Background(), "Example.COM")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 0 {
+		t.Errorf("MatchCount = %d, want 0 (allowlist should be case-insensitive)", result.MatchCount)
+	}
+}
+
+func TestEngineDenylist(t *testing.T) {
+	e := New(
+		WithDetectors(&stubDetector{name: "noop"}),
+		WithReplacer(replacer.NewRedact()),
+		WithDenylist(model.Name, "ACME Corp"),
+	)
+
+	text := "Contact ACME Corp for details"
+	result, err := e.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 1 {
+		t.Fatalf("MatchCount = %d, want 1", result.MatchCount)
+	}
+	m := result.Matches[0]
+	if m.Type != model.Name {
+		t.Errorf("match type = %v, want Name", m.Type)
+	}
+	if m.Value != "ACME Corp" {
+		t.Errorf("match value = %q, want %q", m.Value, "ACME Corp")
+	}
+	if m.Detector != "denylist" {
+		t.Errorf("match detector = %q, want %q", m.Detector, "denylist")
+	}
+
+	want := "Contact [NAME] for details"
+	if result.Redacted != want {
+		t.Errorf("Redacted:\n got: %q\nwant: %q", result.Redacted, want)
+	}
+}
+
+func TestEngineDenylistMultipleOccurrences(t *testing.T) {
+	e := New(
+		WithDetectors(&stubDetector{name: "noop"}),
+		WithReplacer(replacer.NewRedact()),
+		WithDenylist(model.Name, "secret"),
+	)
+
+	text := "secret and secret again"
+	result, err := e.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 2 {
+		t.Errorf("MatchCount = %d, want 2 (denylist should match all occurrences)", result.MatchCount)
+	}
+}
+
+func TestEngineDenylistCaseInsensitive(t *testing.T) {
+	e := New(
+		WithDetectors(&stubDetector{name: "noop"}),
+		WithReplacer(replacer.NewRedact()),
+		WithDenylist(model.Name, "Secret"),
+	)
+
+	text := "Found SECRET here"
+	result, err := e.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 1 {
+		t.Errorf("MatchCount = %d, want 1 (denylist should be case-insensitive)", result.MatchCount)
+	}
+}
+
+func TestEngineAllowlistAndDenylistCombined(t *testing.T) {
+	detector := &stubDetector{
+		name: "url",
+		matches: []model.Match{
+			{Type: model.URL, Value: "example.com", Start: 0, End: 11, Confidence: 0.9},
+		},
+	}
+
+	e := New(
+		WithDetectors(detector),
+		WithReplacer(replacer.NewRedact()),
+		WithAllowlist("example.com"),
+		WithDenylist(model.Name, "ACME"),
+	)
+
+	text := "example.com by ACME"
+	result, err := e.Process(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// example.com should be filtered (allowlisted), ACME should be injected (denylisted).
+	if result.MatchCount != 1 {
+		t.Fatalf("MatchCount = %d, want 1", result.MatchCount)
+	}
+	if result.Matches[0].Value != "ACME" {
+		t.Errorf("match value = %q, want %q", result.Matches[0].Value, "ACME")
+	}
+}
+
 // Verify Engine implements port.Pipeline.
 var _ port.Pipeline = (*Engine)(nil)
