@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/taoq-ai/wuming/compare/v0.10.1...v0.11.0) (2026-03-20)
+
+
+### Features
+
+* add allowlist/denylist for known safe values ([#104](https://github.com/taoq-ai/wuming/issues/104)) ([7dca120](https://github.com/taoq-ai/wuming/commit/7dca120b5b138af3bfc972e7a818014f144b5b5a)), closes [#100](https://github.com/taoq-ai/wuming/issues/100)
+* add structured data support for JSON and CSV field-level scanning ([#107](https://github.com/taoq-ai/wuming/issues/107)) ([b316fdd](https://github.com/taoq-ai/wuming/commit/b316fdd15a56d3b4a38891e7df01ff612a388859)), closes [#87](https://github.com/taoq-ai/wuming/issues/87)
+
 ## [0.10.1](https://github.com/taoq-ai/wuming/compare/v0.10.0...v0.10.1) (2026-03-20)
 
 
