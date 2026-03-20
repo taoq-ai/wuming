@@ -160,45 +160,58 @@ jobs:
           script: |
             const fs = require('fs');
 
-            // Parse benchstat output into structured data
+            // Parse benchstat output — only the first section (sec/op)
             function parseBenchstat(text) {
-              const lines = text.split('\n').filter(l => l.trim());
+              const lines = text.split('\n');
               const results = [];
+              let inFirstSection = false;
+              let sectionCount = 0;
               for (const line of lines) {
-                // Match lines like: BenchmarkFoo-4  123.4µ ± 5%  234.5µ ± 3%  +89.67% (p=0.001 n=3)
-                // Or baseline-only: BenchmarkFoo-4  123.4µ ± ∞ ¹
+                // Section headers contain │ and metric names like sec/op, B/op, allocs/op
+                if (line.includes('│') && (line.includes('sec/op') || line.includes('B/op') || line.includes('allocs/op'))) {
+                  sectionCount++;
+                  inFirstSection = (sectionCount === 1);
+                  continue;
+                }
+                if (sectionCount > 1) break; // stop after first section
+                if (!inFirstSection) continue;
+                if (!line.trim() || line.startsWith('goos') || line.startsWith('goarch') || line.startsWith('pkg') || line.startsWith('¹') || line.startsWith('²') || line.startsWith('³')) continue;
+                // Parse benchmark line: Name-N  value ± x%  value ± x%  +delta% (p=... n=...)
                 const m = line.match(/^(\S+?)(?:-\d+)?\s+/);
-                if (!m || line.startsWith('goos') || line.startsWith('goarch') || line.startsWith('pkg') || line.startsWith('cpu') || line.startsWith('│') || line.startsWith('¹')) continue;
+                if (!m) continue;
                 const name = m[1];
-                // Check if there's a delta (comparison available)
                 const deltaMatch = line.match(/([+-]\d+\.\d+%)/);
-                const oldMatch = line.match(/(\d+\.?\d*[nµm]?s?)\s*±/);
-                const parts = line.split(/\s{2,}/);
                 results.push({ name, line: line.trim(), delta: deltaMatch ? deltaMatch[1] : null });
               }
               return results;
             }
 
-            function formatTime(name) {
-              // Friendly names for key benchmarks
-              const friendly = {
-                'DetectSmallText': '🔍 Detect small (100B)',
-                'DetectMediumText': '🔍 Detect medium (1KB)',
-                'DetectLargeText': '🔍 Detect large (10KB)',
-                'DetectAllLocales': '🌍 All locales (1KB)',
-                'DetectSingleLocale': '🏷️ Single locale (1KB)',
-                'RedactSmallText': '✂️ Redact small (100B)',
-                'RedactLargeText': '✂️ Redact large (10KB)',
-                'ThroughputAllLocales': '⚡ Throughput (all)',
-                'ThroughputSingleLocale': '⚡ Throughput (single)',
-                'ColdStart': '🧊 Cold start',
-                'WarmDetection': '🔥 Warm detection',
-              };
-              for (const [key, val] of Object.entries(friendly)) {
-                if (name.includes(key)) return val;
-              }
-              return null;
+            function statusIcon(delta) {
+              if (!delta) return '⚪ baseline';
+              const pct = parseFloat(delta);
+              if (pct > 10) return `🔴 ${delta} slower`;
+              if (pct > 0) return `🟡 ${delta} slower`;
+              if (pct < -5) return `🟢 ${delta} faster`;
+              return `⚪ ${delta}`;
             }
+
+            function hasRegressionCheck(delta) {
+              return delta && parseFloat(delta) > 10;
+            }
+
+            // Exact-match friendly names for top-level benchmarks (no sub-benchmarks)
+            const summaryBenchmarks = {
+              'DetectSmallText': '🔍 Detect small (100B)',
+              'DetectMediumText': '🔍 Detect medium (1KB)',
+              'DetectLargeText': '🔍 Detect large (10KB)',
+              'DetectAllLocales': '🌍 All locales (1KB)',
+              'DetectSingleLocale': '🏷️ Single locale (1KB)',
+              'RedactSmallText': '✂️ Redact small (100B)',
+              'RedactLargeText': '✂️ Redact large (10KB)',
+              'ThroughputAllLocales': '⚡ Throughput (all locales)',
+              'ColdStart': '🧊 Cold start',
+              'WarmDetection': '🔥 Warm detection',
+            };
 
             let body = '## ⚡ Benchmark Results\n\n';
             let hasRegression = false;
@@ -211,65 +224,63 @@ jobs:
               if (results.length === 0) continue;
 
               if (suite === 'root') {
-                // Summary table for key benchmarks
-                const keyBenchmarks = results.filter(r => formatTime(r.name));
-                if (keyBenchmarks.length > 0) {
+                // Summary table — only exact top-level benchmark names
+                const keyResults = results.filter(r => summaryBenchmarks[r.name]);
+                if (keyResults.length > 0) {
                   body += '### Summary\n\n';
                   body += '| Benchmark | Status |\n';
                   body += '|-----------|--------|\n';
-                  for (const r of keyBenchmarks) {
-                    let status = '⚪ baseline';
-                    if (r.delta) {
-                      const pct = parseFloat(r.delta);
-                      if (pct > 10) { status = `🔴 ${r.delta} slower`; hasRegression = true; }
-                      else if (pct > 0) { status = `🟡 ${r.delta} slower`; }
-                      else if (pct < -5) { status = `🟢 ${r.delta} faster`; }
-                      else { status = `⚪ ${r.delta}`; }
-                    }
-                    body += `| ${formatTime(r.name)} | ${status} |\n`;
+                  for (const r of keyResults) {
+                    if (hasRegressionCheck(r.delta)) hasRegression = true;
+                    body += `| ${summaryBenchmarks[r.name]} | ${statusIcon(r.delta)} |\n`;
                   }
                   body += '\n';
                 }
 
-                // Per-detector in collapsible
-                const detectorBenchmarks = results.filter(r => r.name.includes('PerDetector'));
-                if (detectorBenchmarks.length > 0) {
+                // Per-locale throughput in collapsible
+                const throughputLocales = results.filter(r => r.name.startsWith('ThroughputSingleLocale/'));
+                if (throughputLocales.length > 0) {
                   body += '<details>\n';
-                  body += `<summary>📊 Per-detector breakdown (${detectorBenchmarks.length} detectors)</summary>\n\n`;
-                  body += '| Detector | Status |\n';
-                  body += '|----------|--------|\n';
-                  for (const r of detectorBenchmarks) {
-                    const detector = r.name.replace('PerDetector/', '');
-                    let status = '⚪ baseline';
-                    if (r.delta) {
-                      const pct = parseFloat(r.delta);
-                      if (pct > 10) { status = `🔴 ${r.delta}`; hasRegression = true; }
-                      else if (pct > 0) { status = `🟡 ${r.delta}`; }
-                      else if (pct < -5) { status = `🟢 ${r.delta}`; }
-                      else { status = `⚪ ${r.delta}`; }
-                    }
-                    body += `| \`${detector}\` | ${status} |\n`;
+                  body += `<summary>⚡ Per-locale throughput (${throughputLocales.length} locales)</summary>\n\n`;
+                  body += '| Locale | Status |\n';
+                  body += '|--------|--------|\n';
+                  for (const r of throughputLocales) {
+                    const locale = r.name.replace('ThroughputSingleLocale/', '');
+                    if (hasRegressionCheck(r.delta)) hasRegression = true;
+                    body += `| \`${locale}\` | ${statusIcon(r.delta)} |\n`;
                   }
                   body += '\n</details>\n\n';
                 }
 
-                // Other benchmarks (concurrency, throughput) in collapsible
-                const otherBenchmarks = results.filter(r => !formatTime(r.name) && !r.name.includes('PerDetector'));
-                if (otherBenchmarks.length > 0) {
+                // Per-detector in collapsible
+                const detectorResults = results.filter(r => r.name.startsWith('PerDetector/'));
+                if (detectorResults.length > 0) {
                   body += '<details>\n';
-                  body += `<summary>🔧 Other benchmarks (${otherBenchmarks.length})</summary>\n\n`;
+                  body += `<summary>📊 Per-detector breakdown (${detectorResults.length} detectors)</summary>\n\n`;
+                  body += '| Detector | Status |\n';
+                  body += '|----------|--------|\n';
+                  for (const r of detectorResults) {
+                    const detector = r.name.replace('PerDetector/', '');
+                    if (hasRegressionCheck(r.delta)) hasRegression = true;
+                    body += `| \`${detector}\` | ${statusIcon(r.delta)} |\n`;
+                  }
+                  body += '\n</details>\n\n';
+                }
+
+                // Other benchmarks (latency, concurrency) in collapsible
+                const otherResults = results.filter(r =>
+                  !summaryBenchmarks[r.name] &&
+                  !r.name.startsWith('ThroughputSingleLocale/') &&
+                  !r.name.startsWith('PerDetector/')
+                );
+                if (otherResults.length > 0) {
+                  body += '<details>\n';
+                  body += `<summary>🔧 Other benchmarks (${otherResults.length})</summary>\n\n`;
                   body += '| Benchmark | Status |\n';
                   body += '|-----------|--------|\n';
-                  for (const r of otherBenchmarks) {
-                    let status = '⚪ baseline';
-                    if (r.delta) {
-                      const pct = parseFloat(r.delta);
-                      if (pct > 10) { status = `🔴 ${r.delta}`; }
-                      else if (pct > 0) { status = `🟡 ${r.delta}`; }
-                      else if (pct < -5) { status = `🟢 ${r.delta}`; }
-                      else { status = `⚪ ${r.delta}`; }
-                    }
-                    body += `| \`${r.name}\` | ${status} |\n`;
+                  for (const r of otherResults) {
+                    if (hasRegressionCheck(r.delta)) hasRegression = true;
+                    body += `| \`${r.name}\` | ${statusIcon(r.delta)} |\n`;
                   }
                   body += '\n</details>\n\n';
                 }
