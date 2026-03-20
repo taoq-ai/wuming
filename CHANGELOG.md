@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.1](https://github.com/taoq-ai/wuming/compare/v0.13.0...v0.13.1) (2026-03-20)
+
+
+### Documentation
+
+* create SKILL.md for AI agent integration guidance ([#111](https://github.com/taoq-ai/wuming/issues/111)) ([959e509](https://github.com/taoq-ai/wuming/commit/959e5091d5a1224254f3a195e8d89f30ea9d0ca7)), closes [#110](https://github.com/taoq-ai/wuming/issues/110)
+
 ## [0.13.0](https://github.com/taoq-ai/wuming/compare/v0.12.0...v0.13.0) (2026-03-20)
 
 
