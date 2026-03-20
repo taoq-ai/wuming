@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/taoq-ai/wuming/compare/v0.11.1...v0.12.0) (2026-03-20)
+
+
+### Features
+
+* consistent redaction — same PII value maps to same replacement ([#106](https://github.com/taoq-ai/wuming/issues/106)) ([94e869c](https://github.com/taoq-ai/wuming/commit/94e869c2fcf1ea98522eebf694f5c5d0ba403749)), closes [#88](https://github.com/taoq-ai/wuming/issues/88)
+
 ## [0.11.1](https://github.com/taoq-ai/wuming/compare/v0.11.0...v0.11.1) (2026-03-20)
 
 
