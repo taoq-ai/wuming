@@ -5,11 +5,18 @@ package engine
 import (
 	"context"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/taoq-ai/wuming/domain/model"
 	"github.com/taoq-ai/wuming/domain/port"
 )
+
+// DenylistEntry pairs a value with the PII type it should always be flagged as.
+type DenylistEntry struct {
+	Value   string
+	PIIType model.PIIType
+}
 
 // Engine orchestrates PII detection and replacement.
 type Engine struct {
@@ -19,6 +26,8 @@ type Engine struct {
 	piiTypes            map[model.PIIType]bool
 	concurrency         int
 	confidenceThreshold float64
+	allowlist           map[string]bool
+	denylist            []DenylistEntry
 }
 
 // Option configures an Engine.
@@ -71,11 +80,31 @@ func WithConfidenceThreshold(f float64) Option {
 	}
 }
 
+// WithAllowlist adds values that should never be flagged as PII.
+// Matching is case-insensitive.
+func WithAllowlist(values ...string) Option {
+	return func(e *Engine) {
+		for _, v := range values {
+			e.allowlist[strings.ToLower(v)] = true
+		}
+	}
+}
+
+// WithDenylist adds values that should always be flagged as the given PII type.
+func WithDenylist(piiType model.PIIType, values ...string) Option {
+	return func(e *Engine) {
+		for _, v := range values {
+			e.denylist = append(e.denylist, DenylistEntry{Value: v, PIIType: piiType})
+		}
+	}
+}
+
 // New creates a new Engine with the given options.
 func New(opts ...Option) *Engine {
 	e := &Engine{
-		locales:  make(map[string]bool),
-		piiTypes: make(map[model.PIIType]bool),
+		locales:   make(map[string]bool),
+		piiTypes:  make(map[model.PIIType]bool),
+		allowlist: make(map[string]bool),
 	}
 	for _, opt := range opts {
 		opt(e)
@@ -93,6 +122,8 @@ func (e *Engine) Process(ctx context.Context, text string) (*port.Result, error)
 
 	allMatches = e.filterByConfidence(allMatches)
 	allMatches = e.filterByPIIType(allMatches)
+	allMatches = e.filterByAllowlist(allMatches)
+	allMatches = e.injectDenylist(text, allMatches)
 	allMatches = dedup(allMatches)
 
 	redacted := text
@@ -204,6 +235,51 @@ func (e *Engine) filterByPIIType(matches []model.Match) []model.Match {
 		}
 	}
 	return filtered
+}
+
+// filterByAllowlist removes matches whose value appears in the allowlist.
+func (e *Engine) filterByAllowlist(matches []model.Match) []model.Match {
+	if len(e.allowlist) == 0 {
+		return matches
+	}
+	var filtered []model.Match
+	for _, m := range matches {
+		if !e.allowlist[strings.ToLower(m.Value)] {
+			filtered = append(filtered, m)
+		}
+	}
+	return filtered
+}
+
+// injectDenylist scans the text for denylist values and adds them as matches.
+func (e *Engine) injectDenylist(text string, existing []model.Match) []model.Match {
+	if len(e.denylist) == 0 {
+		return existing
+	}
+	result := existing
+	lower := strings.ToLower(text)
+	for _, entry := range e.denylist {
+		target := strings.ToLower(entry.Value)
+		start := 0
+		for {
+			idx := strings.Index(lower[start:], target)
+			if idx < 0 {
+				break
+			}
+			absStart := start + idx
+			absEnd := absStart + len(entry.Value)
+			result = append(result, model.Match{
+				Type:       entry.PIIType,
+				Value:      text[absStart:absEnd],
+				Start:      absStart,
+				End:        absEnd,
+				Confidence: 1.0,
+				Detector:   "denylist",
+			})
+			start = absEnd
+		}
+	}
+	return result
 }
 
 // dedup removes overlapping matches, preferring higher confidence.

@@ -42,6 +42,8 @@ type config struct {
 	piiTypes            []model.PIIType
 	concurrency         int
 	confidenceThreshold float64
+	allowlist           []string
+	denylist            []engine.DenylistEntry
 	err                 error
 }
 
@@ -86,6 +88,26 @@ func WithConcurrency(n int) Option {
 func WithConfidenceThreshold(f float64) Option {
 	return func(c *config) {
 		c.confidenceThreshold = f
+	}
+}
+
+// WithAllowlist specifies values that should never be flagged as PII.
+// For example, a company domain like "example.com" can be allowlisted so
+// it is not reported as a URL match. Matching is case-insensitive.
+func WithAllowlist(values ...string) Option {
+	return func(c *config) {
+		c.allowlist = append(c.allowlist, values...)
+	}
+}
+
+// WithDenylist specifies values that should always be flagged as the given PII
+// type, even if no detector would normally find them. The engine injects
+// synthetic matches with confidence 1.0 for every occurrence of each value.
+func WithDenylist(piiType model.PIIType, values ...string) Option {
+	return func(c *config) {
+		for _, v := range values {
+			c.denylist = append(c.denylist, engine.DenylistEntry{Value: v, PIIType: piiType})
+		}
 	}
 }
 
@@ -154,6 +176,14 @@ func New(opts ...Option) (*Wuming, error) {
 	}
 	if cfg.confidenceThreshold > 0 {
 		engineOpts = append(engineOpts, engine.WithConfidenceThreshold(cfg.confidenceThreshold))
+	}
+	if len(cfg.allowlist) > 0 {
+		engineOpts = append(engineOpts, engine.WithAllowlist(cfg.allowlist...))
+	}
+	if len(cfg.denylist) > 0 {
+		for _, entry := range cfg.denylist {
+			engineOpts = append(engineOpts, engine.WithDenylist(entry.PIIType, entry.Value))
+		}
 	}
 
 	return &Wuming{engine: engine.New(engineOpts...)}, nil

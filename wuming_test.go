@@ -203,6 +203,84 @@ func TestWithPresetUnknownReturnsError(t *testing.T) {
 	}
 }
 
+func TestWithAllowlist(t *testing.T) {
+	det := &stubDetector{
+		matches: []model.Match{
+			{Type: model.Email, Value: "john@example.com", Start: 0, End: 16, Confidence: 1.0},
+			{Type: model.URL, Value: "example.com", Start: 20, End: 31, Confidence: 0.9},
+		},
+	}
+
+	w, err := New(WithDetectors(det), WithAllowlist("example.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	matches, err := w.Detect(context.Background(), "john@example.com or example.com here")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(matches) != 1 {
+		t.Fatalf("got %d matches, want 1", len(matches))
+	}
+	if matches[0].Type != model.Email {
+		t.Errorf("match type = %v, want Email", matches[0].Type)
+	}
+}
+
+func TestWithDenylist(t *testing.T) {
+	det := &stubDetector{} // no matches from detector
+
+	w, err := New(WithDetectors(det), WithDenylist(model.Name, "ACME Corp"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := w.Process(context.Background(), "Contact ACME Corp for details")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 1 {
+		t.Fatalf("MatchCount = %d, want 1", result.MatchCount)
+	}
+	if result.Matches[0].Value != "ACME Corp" {
+		t.Errorf("match value = %q, want %q", result.Matches[0].Value, "ACME Corp")
+	}
+	want := "Contact [NAME] for details"
+	if result.Redacted != want {
+		t.Errorf("Redacted = %q, want %q", result.Redacted, want)
+	}
+}
+
+func TestWithAllowlistAndDenylist(t *testing.T) {
+	det := &stubDetector{
+		matches: []model.Match{
+			{Type: model.URL, Value: "example.com", Start: 0, End: 11, Confidence: 0.9},
+		},
+	}
+
+	w, err := New(
+		WithDetectors(det),
+		WithAllowlist("example.com"),
+		WithDenylist(model.Name, "ACME"),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := w.Process(context.Background(), "example.com by ACME")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.MatchCount != 1 {
+		t.Fatalf("MatchCount = %d, want 1", result.MatchCount)
+	}
+	if result.Matches[0].Value != "ACME" {
+		t.Errorf("match value = %q, want %q", result.Matches[0].Value, "ACME")
+	}
+}
+
 func TestWithLocaleFilters(t *testing.T) {
 	w, err := New(WithLocale("nl"))
 	if err != nil {
