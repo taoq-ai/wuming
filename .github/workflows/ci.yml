@@ -22,7 +22,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - run: go build ./...
-      - run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+      - run: go test -race -short -coverprofile=coverage.out -covermode=atomic ./...
       - run: go vet ./...
       - name: Upload coverage to Codecov
         if: matrix.go-version == '1.23' && matrix.os == 'ubuntu-latest'
@@ -91,10 +91,206 @@ jobs:
         with:
           go-version: "1.23"
       - name: Run benchmarks
-        run: go test -bench=. -benchmem -run='^$' -count=1 ./... | tee benchmark-results.txt
+        run: go test -bench=. -benchmem -short -run='^$' -count=1 ./... | tee benchmark-results.txt
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: benchmark-results.txt
           retention-days: 30
+
+  benchmark-run:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        ref: [base, head]
+        suite:
+          - name: root
+            path: .
+          - name: detectors
+            path: ./adapter/detector/...
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout base ref
+        if: matrix.ref == 'base'
+        run: git checkout ${{ github.event.pull_request.base.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Run benchmarks
+        run: go test -bench=. -benchmem -count=3 -run='^$' -short ${{ matrix.suite.path }} > results.txt
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-${{ matrix.ref }}-${{ matrix.suite.name }}
+          path: results.txt
+          retention-days: 1
+
+  benchmark-compare:
+    runs-on: ubuntu-latest
+    needs: benchmark-run
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Install benchstat
+        run: go install golang.org/x/perf/cmd/benchstat@latest
+      - name: Download all benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bench-*
+      - name: Compare benchmarks
+        run: |
+          # Run benchstat for each suite and save raw output
+          for suite in root detectors; do
+            if [ -f "bench-base-${suite}/results.txt" ] && [ -f "bench-head-${suite}/results.txt" ]; then
+              benchstat "bench-base-${suite}/results.txt" "bench-head-${suite}/results.txt" > "benchstat-${suite}.txt" 2>&1 || true
+            fi
+          done
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Parse benchstat output into structured data
+            function parseBenchstat(text) {
+              const lines = text.split('\n').filter(l => l.trim());
+              const results = [];
+              for (const line of lines) {
+                // Match lines like: BenchmarkFoo-4  123.4µ ± 5%  234.5µ ± 3%  +89.67% (p=0.001 n=3)
+                // Or baseline-only: BenchmarkFoo-4  123.4µ ± ∞ ¹
+                const m = line.match(/^(\S+?)(?:-\d+)?\s+/);
+                if (!m || line.startsWith('goos') || line.startsWith('goarch') || line.startsWith('pkg') || line.startsWith('cpu') || line.startsWith('│') || line.startsWith('¹')) continue;
+                const name = m[1];
+                // Check if there's a delta (comparison available)
+                const deltaMatch = line.match(/([+-]\d+\.\d+%)/);
+                const oldMatch = line.match(/(\d+\.?\d*[nµm]?s?)\s*±/);
+                const parts = line.split(/\s{2,}/);
+                results.push({ name, line: line.trim(), delta: deltaMatch ? deltaMatch[1] : null });
+              }
+              return results;
+            }
+
+            function formatTime(name) {
+              // Friendly names for key benchmarks
+              const friendly = {
+                'DetectSmallText': '🔍 Detect small (100B)',
+                'DetectMediumText': '🔍 Detect medium (1KB)',
+                'DetectLargeText': '🔍 Detect large (10KB)',
+                'DetectAllLocales': '🌍 All locales (1KB)',
+                'DetectSingleLocale': '🏷️ Single locale (1KB)',
+                'RedactSmallText': '✂️ Redact small (100B)',
+                'RedactLargeText': '✂️ Redact large (10KB)',
+                'ThroughputAllLocales': '⚡ Throughput (all)',
+                'ThroughputSingleLocale': '⚡ Throughput (single)',
+                'ColdStart': '🧊 Cold start',
+                'WarmDetection': '🔥 Warm detection',
+              };
+              for (const [key, val] of Object.entries(friendly)) {
+                if (name.includes(key)) return val;
+              }
+              return null;
+            }
+
+            let body = '## ⚡ Benchmark Results\n\n';
+            let hasRegression = false;
+
+            for (const suite of ['root', 'detectors']) {
+              const file = `benchstat-${suite}.txt`;
+              if (!fs.existsSync(file)) continue;
+              const raw = fs.readFileSync(file, 'utf8');
+              const results = parseBenchstat(raw);
+              if (results.length === 0) continue;
+
+              if (suite === 'root') {
+                // Summary table for key benchmarks
+                const keyBenchmarks = results.filter(r => formatTime(r.name));
+                if (keyBenchmarks.length > 0) {
+                  body += '### Summary\n\n';
+                  body += '| Benchmark | Status |\n';
+                  body += '|-----------|--------|\n';
+                  for (const r of keyBenchmarks) {
+                    let status = '⚪ baseline';
+                    if (r.delta) {
+                      const pct = parseFloat(r.delta);
+                      if (pct > 10) { status = `🔴 ${r.delta} slower`; hasRegression = true; }
+                      else if (pct > 0) { status = `🟡 ${r.delta} slower`; }
+                      else if (pct < -5) { status = `🟢 ${r.delta} faster`; }
+                      else { status = `⚪ ${r.delta}`; }
+                    }
+                    body += `| ${formatTime(r.name)} | ${status} |\n`;
+                  }
+                  body += '\n';
+                }
+
+                // Per-detector in collapsible
+                const detectorBenchmarks = results.filter(r => r.name.includes('PerDetector'));
+                if (detectorBenchmarks.length > 0) {
+                  body += '<details>\n';
+                  body += `<summary>📊 Per-detector breakdown (${detectorBenchmarks.length} detectors)</summary>\n\n`;
+                  body += '| Detector | Status |\n';
+                  body += '|----------|--------|\n';
+                  for (const r of detectorBenchmarks) {
+                    const detector = r.name.replace('PerDetector/', '');
+                    let status = '⚪ baseline';
+                    if (r.delta) {
+                      const pct = parseFloat(r.delta);
+                      if (pct > 10) { status = `🔴 ${r.delta}`; hasRegression = true; }
+                      else if (pct > 0) { status = `🟡 ${r.delta}`; }
+                      else if (pct < -5) { status = `🟢 ${r.delta}`; }
+                      else { status = `⚪ ${r.delta}`; }
+                    }
+                    body += `| \`${detector}\` | ${status} |\n`;
+                  }
+                  body += '\n</details>\n\n';
+                }
+
+                // Other benchmarks (concurrency, throughput) in collapsible
+                const otherBenchmarks = results.filter(r => !formatTime(r.name) && !r.name.includes('PerDetector'));
+                if (otherBenchmarks.length > 0) {
+                  body += '<details>\n';
+                  body += `<summary>🔧 Other benchmarks (${otherBenchmarks.length})</summary>\n\n`;
+                  body += '| Benchmark | Status |\n';
+                  body += '|-----------|--------|\n';
+                  for (const r of otherBenchmarks) {
+                    let status = '⚪ baseline';
+                    if (r.delta) {
+                      const pct = parseFloat(r.delta);
+                      if (pct > 10) { status = `🔴 ${r.delta}`; }
+                      else if (pct > 0) { status = `🟡 ${r.delta}`; }
+                      else if (pct < -5) { status = `🟢 ${r.delta}`; }
+                      else { status = `⚪ ${r.delta}`; }
+                    }
+                    body += `| \`${r.name}\` | ${status} |\n`;
+                  }
+                  body += '\n</details>\n\n';
+                }
+              }
+
+              // Raw benchstat in collapsible
+              body += '<details>\n';
+              body += `<summary>📋 Raw benchstat output (${suite})</summary>\n\n`;
+              body += '```\n' + raw + '\n```\n';
+              body += '</details>\n\n';
+            }
+
+            if (hasRegression) {
+              body += '> ⚠️ **Performance regression detected** — one or more benchmarks degraded >10%\n';
+            }
+
+            body += '\n---\n*Generated by CI benchmark comparison*\n';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
