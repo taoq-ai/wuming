@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1](https://github.com/taoq-ai/wuming/compare/v0.10.0...v0.10.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* improve benchmark PR comment formatting ([#85](https://github.com/taoq-ai/wuming/issues/85)) ([58a5ce6](https://github.com/taoq-ai/wuming/commit/58a5ce697279e58a37ba33138727be8e6c463486))
+
 ## [0.10.0](https://github.com/taoq-ai/wuming/compare/v0.9.1...v0.10.0) (2026-03-19)
 
 
