@@ -24,7 +24,7 @@ type Consistent struct {
 	counters map[model.PIIType]int
 }
 
-// NewConsistent wraps the given replacer with consistent-replacement behaviour.
+// NewConsistent wraps the given replacer with consistent-replacement behavior.
 func NewConsistent(inner port.Replacer) *Consistent {
 	return &Consistent{
 		inner:    inner,
