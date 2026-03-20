@@ -47,6 +47,7 @@ type config struct {
 	allowlist           []string
 	denylist            []engine.DenylistEntry
 	err                 error
+	consistentRedaction bool
 }
 
 // WithDetectors adds PII detectors.
@@ -113,6 +114,16 @@ func WithDenylist(piiType model.PIIType, values ...string) Option {
 	}
 }
 
+// WithConsistentRedaction ensures that the same PII value always maps to
+// the same replacement string. For example, if "john@example.com" appears
+// three times the Redact replacer will produce "[EMAIL_1]" in every position.
+// This works with any replacer strategy (Redact, Hash, Mask, Custom).
+func WithConsistentRedaction() Option {
+	return func(c *config) {
+		c.consistentRedaction = true
+	}
+}
+
 // WithPreset configures the instance for a specific compliance regulation
 // (e.g. "gdpr", "hipaa", "pci-dss"). It sets the appropriate locales, PII
 // types, and detectors based on the preset definition. If the preset name
@@ -160,6 +171,11 @@ func New(opts ...Option) (*Wuming, error) {
 	// Default replacer.
 	if cfg.replacer == nil {
 		cfg.replacer = replacer.NewRedact()
+	}
+
+	// Wrap with consistent-replacement behavior when requested.
+	if cfg.consistentRedaction {
+		cfg.replacer = replacer.NewConsistent(cfg.replacer)
 	}
 
 	var engineOpts []engine.Option
