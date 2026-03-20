@@ -20,7 +20,10 @@ func TestStressLargeDocument(t *testing.T) {
 	const docSize = 10 * 1024 * 1024 // 10 MB
 	text := generateTextWithPII(docSize, 0.01)
 
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	start := time.Now()
@@ -44,7 +47,10 @@ func TestStressHighPIIDensity(t *testing.T) {
 	const docSize = 1024 * 1024 // 1 MB
 	text := generateTextWithPII(docSize, 1.0)
 
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	start := time.Now()
@@ -70,7 +76,10 @@ func TestStressZeroPII(t *testing.T) {
 	const docSize = 10 * 1024 * 1024 // 10 MB
 	text := generateText(docSize)
 
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	start := time.Now()
@@ -97,7 +106,10 @@ func TestStressUnicode(t *testing.T) {
 	const docSize = 1024 * 1024 // 1 MB of CJK text with embedded PII
 	text := generateCJKText(docSize)
 
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	start := time.Now()

@@ -12,7 +12,10 @@ import (
 // TestZeroConfigDetectsAllLocales verifies that a zero-config Wuming instance
 // detects PII from multiple locales when no locale filter is set.
 func TestZeroConfigDetectsAllLocales(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	// Text with PII from common, NL, and BR locales using unambiguous patterns.
@@ -67,7 +70,10 @@ func TestWithLocaleFiltersCorrectly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			w := New(WithLocale(tt.locale))
+			w, err := New(WithLocale(tt.locale))
+			if err != nil {
+				t.Fatal(err)
+			}
 			matches, err := w.Detect(ctx, text)
 			if err != nil {
 				t.Fatal(err)
@@ -104,7 +110,10 @@ func TestWithLocaleFiltersCorrectly(t *testing.T) {
 // TestOverlappingMatchesDeduplication verifies that overlapping or duplicate matches
 // from different detectors are properly handled.
 func TestOverlappingMatchesDeduplication(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	// A single email should not produce duplicate matches.
@@ -128,7 +137,10 @@ func TestOverlappingMatchesDeduplication(t *testing.T) {
 
 // TestEdgeCasePIIAtStartOfString verifies PII detection at the beginning of input.
 func TestEdgeCasePIIAtStartOfString(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	text := "alice@example.com is my email"
@@ -153,7 +165,10 @@ func TestEdgeCasePIIAtStartOfString(t *testing.T) {
 
 // TestEdgeCasePIIAtEndOfString verifies PII detection at the end of input.
 func TestEdgeCasePIIAtEndOfString(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	text := "Send to alice@example.com"
@@ -179,7 +194,10 @@ func TestEdgeCasePIIAtEndOfString(t *testing.T) {
 // TestEdgeCaseMultiplePIISameString verifies detection of multiple PII items
 // of different types within a single string.
 func TestEdgeCaseMultiplePIISameString(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	text := "Email alice@example.com, card 4111111111111111, IP 192.168.1.1"
@@ -207,7 +225,10 @@ func TestEdgeCaseMultiplePIISameString(t *testing.T) {
 
 // TestEdgeCaseEmptyString verifies that an empty string produces no matches and no errors.
 func TestEdgeCaseEmptyString(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	matches, err := w.Detect(ctx, "")
@@ -221,7 +242,10 @@ func TestEdgeCaseEmptyString(t *testing.T) {
 
 // TestEdgeCaseWhitespaceOnly verifies that whitespace-only input produces no matches.
 func TestEdgeCaseWhitespaceOnly(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	matches, err := w.Detect(ctx, "   \t\n  ")
@@ -235,7 +259,10 @@ func TestEdgeCaseWhitespaceOnly(t *testing.T) {
 
 // TestRedactPreservesNonPIIText verifies redaction replaces PII but keeps surrounding text.
 func TestRedactPreservesNonPIIText(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	text := "Hello world, email is alice@example.com, goodbye."
@@ -257,7 +284,10 @@ func TestRedactPreservesNonPIIText(t *testing.T) {
 
 // TestProcessReturnsCompleteResult verifies the Process method returns all expected fields.
 func TestProcessReturnsCompleteResult(t *testing.T) {
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	text := "SSN: 078-05-1120 and email test@example.com"
@@ -305,7 +335,10 @@ func TestCorpusPositiveBR(t *testing.T) {
 func TestCorpusNegativeFalsePositives(t *testing.T) {
 	cases := loadCorpusNegative(t, "false_positives.json")
 
-	w := New()
+	w, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	for _, tc := range cases {
@@ -331,10 +364,14 @@ func testCorpusFile(t *testing.T, filename, locale string) {
 	cases := loadCorpusPositive(t, filename)
 
 	var w *Wuming
+	var newErr error
 	if locale != "" {
-		w = New(WithLocale(locale))
+		w, newErr = New(WithLocale(locale))
 	} else {
-		w = New()
+		w, newErr = New()
+	}
+	if newErr != nil {
+		t.Fatal(newErr)
 	}
 	ctx := context.Background()
 

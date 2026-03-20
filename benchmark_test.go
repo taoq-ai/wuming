@@ -144,7 +144,10 @@ func generateCJKText(size int) string {
 // ---------------------------------------------------------------------------
 
 func BenchmarkDetectSmallText(b *testing.B) {
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -156,7 +159,10 @@ func BenchmarkDetectSmallText(b *testing.B) {
 }
 
 func BenchmarkDetectMediumText(b *testing.B) {
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -168,7 +174,10 @@ func BenchmarkDetectMediumText(b *testing.B) {
 }
 
 func BenchmarkDetectLargeText(b *testing.B) {
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -181,7 +190,10 @@ func BenchmarkDetectLargeText(b *testing.B) {
 
 func BenchmarkDetectAllLocales(b *testing.B) {
 	// Zero-config uses all registered detectors across all locales.
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	text := mediumText
 	b.ResetTimer()
@@ -195,7 +207,10 @@ func BenchmarkDetectAllLocales(b *testing.B) {
 
 func BenchmarkDetectSingleLocale(b *testing.B) {
 	// Restricted to a single locale (US) plus common detectors.
-	w := New(WithLocale("us"))
+	w, bErr := New(WithLocale("us"))
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	text := mediumText
 	b.ResetTimer()
@@ -208,7 +223,10 @@ func BenchmarkDetectSingleLocale(b *testing.B) {
 }
 
 func BenchmarkRedactSmallText(b *testing.B) {
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -220,7 +238,10 @@ func BenchmarkRedactSmallText(b *testing.B) {
 }
 
 func BenchmarkRedactLargeText(b *testing.B) {
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -265,7 +286,10 @@ func BenchmarkThroughputSingleLocale(b *testing.B) {
 	for _, locale := range registry.Locales() {
 		locale := locale
 		b.Run(locale, func(b *testing.B) {
-			w := New(WithLocale(locale))
+			w, bErr := New(WithLocale(locale))
+			if bErr != nil {
+				b.Fatal(bErr)
+			}
 			b.SetBytes(textBytes)
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
@@ -280,7 +304,10 @@ func BenchmarkThroughputSingleLocale(b *testing.B) {
 
 func BenchmarkThroughputAllLocales(b *testing.B) {
 	ctx := context.Background()
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	text := largeText
 	b.SetBytes(int64(len(text)))
 	b.ResetTimer()
@@ -309,7 +336,10 @@ func BenchmarkLatencyBySize(b *testing.B) {
 	}
 
 	ctx := context.Background()
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 
 	for _, sz := range sizes {
 		sz := sz
@@ -339,7 +369,10 @@ func BenchmarkConcurrency(b *testing.B) {
 	for _, p := range goroutineCounts {
 		p := p
 		b.Run(fmt.Sprintf("goroutines-%d", p), func(b *testing.B) {
-			w := New()
+			w, bErr := New()
+			if bErr != nil {
+				b.Fatal(bErr)
+			}
 			b.SetParallelism(p)
 			b.ResetTimer()
 			b.RunParallel(func(pb *testing.PB) {
@@ -364,7 +397,10 @@ func BenchmarkColdStart(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		w := New()
+		w, newErr := New()
+		if newErr != nil {
+			b.Fatal(newErr)
+		}
 		_, err := w.Detect(ctx, text)
 		if err != nil {
 			b.Fatal(err)
@@ -374,7 +410,10 @@ func BenchmarkColdStart(b *testing.B) {
 
 func BenchmarkWarmDetection(b *testing.B) {
 	ctx := context.Background()
-	w := New()
+	w, bErr := New()
+	if bErr != nil {
+		b.Fatal(bErr)
+	}
 	text := mediumText
 
 	// Warm up: run one detection to initialize any lazy state.

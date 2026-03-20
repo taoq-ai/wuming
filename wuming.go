@@ -42,6 +42,7 @@ type config struct {
 	piiTypes            []model.PIIType
 	concurrency         int
 	confidenceThreshold float64
+	err                 error
 }
 
 // WithDetectors adds PII detectors.
@@ -90,15 +91,14 @@ func WithConfidenceThreshold(f float64) Option {
 
 // WithPreset configures the instance for a specific compliance regulation
 // (e.g. "gdpr", "hipaa", "pci-dss"). It sets the appropriate locales, PII
-// types, and detectors based on the preset definition. Returns an error-
-// capturing option: if the preset name is unknown the resulting Wuming will
-// be nil and New will panic. Callers should validate names with preset.Get
-// or preset.List beforehand if unsure.
+// types, and detectors based on the preset definition. If the preset name
+// is unknown, New will return a non-nil error.
 func WithPreset(name string) Option {
 	return func(c *config) {
 		p, err := preset.Get(name)
 		if err != nil {
-			panic(err)
+			c.err = err
+			return
 		}
 
 		// Collect detectors for each locale in the preset.
@@ -117,10 +117,15 @@ func WithPreset(name string) Option {
 }
 
 // New creates a new Wuming instance with the given options.
-func New(opts ...Option) *Wuming {
+// It returns an error if any option fails (e.g. an unknown preset name).
+func New(opts ...Option) (*Wuming, error) {
 	cfg := &config{}
 	for _, opt := range opts {
 		opt(cfg)
+	}
+
+	if cfg.err != nil {
+		return nil, cfg.err
 	}
 
 	// Default to all detectors if none explicitly provided.
@@ -151,7 +156,7 @@ func New(opts ...Option) *Wuming {
 		engineOpts = append(engineOpts, engine.WithConfidenceThreshold(cfg.confidenceThreshold))
 	}
 
-	return &Wuming{engine: engine.New(engineOpts...)}
+	return &Wuming{engine: engine.New(engineOpts...)}, nil
 }
 
 // Process runs PII detection and replacement, returning the full result.
@@ -185,7 +190,11 @@ var (
 
 func getDefault() *Wuming {
 	defaultOnce.Do(func() {
-		defaultInstance = New()
+		w, err := New()
+		if err != nil {
+			panic("wuming: failed to create default instance: " + err.Error())
+		}
+		defaultInstance = w
 	})
 	return defaultInstance
 }

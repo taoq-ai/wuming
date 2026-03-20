@@ -21,9 +21,12 @@ func main() {
 	fmt.Println()
 
 	// Configured instance: restrict to Dutch locale.
-	w := wuming.New(
+	w, err := wuming.New(
 		wuming.WithLocale("nl"),
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	text := "Email john@acme.com, SSN 123-45-6789, BSN 111222333, call 06-12345678"
 	result, err := w.Process(ctx, text)
