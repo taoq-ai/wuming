@@ -17,11 +17,13 @@ package wuming
 
 import (
 	"context"
+	"io"
 	"sync"
 
 	"github.com/taoq-ai/wuming/adapter/preset"
 	"github.com/taoq-ai/wuming/adapter/registry"
 	"github.com/taoq-ai/wuming/adapter/replacer"
+	"github.com/taoq-ai/wuming/adapter/structured"
 	"github.com/taoq-ai/wuming/domain/model"
 	"github.com/taoq-ai/wuming/domain/port"
 	"github.com/taoq-ai/wuming/internal/engine"
@@ -177,6 +179,34 @@ func (w *Wuming) Redact(ctx context.Context, text string) (string, error) {
 	return result.Redacted, nil
 }
 
+// --- Structured data support (JSON, CSV) ---
+
+// RedactJSON detects and redacts PII in a JSON document, scanning each string
+// value individually. It returns a structured result containing the redacted
+// JSON bytes and matches annotated with their JSON path (e.g. "user.email").
+func (w *Wuming) RedactJSON(ctx context.Context, data []byte) (*structured.Result, error) {
+	return structured.NewJSONScanner(w.engine).Scan(ctx, data)
+}
+
+// DetectJSON detects PII in a JSON document without modifying it. Each match
+// is annotated with the JSON path where it was found.
+func (w *Wuming) DetectJSON(ctx context.Context, data []byte) ([]structured.FieldMatch, error) {
+	return structured.NewJSONScanner(w.engine).DetectJSON(ctx, data)
+}
+
+// RedactCSV detects and redacts PII in CSV data read from r. The first row is
+// treated as column headers and used in match paths (e.g. "R2:email").
+// Returns a structured result containing the redacted CSV bytes and matches.
+func (w *Wuming) RedactCSV(ctx context.Context, r io.Reader) (*structured.Result, error) {
+	return structured.NewCSVScannerWithHeader(w.engine).Scan(ctx, r)
+}
+
+// DetectCSV detects PII in CSV data without modifying it. The first row is
+// treated as column headers. Each match is annotated with its row/column path.
+func (w *Wuming) DetectCSV(ctx context.Context, r io.Reader) ([]structured.FieldMatch, error) {
+	return structured.NewCSVScannerWithHeader(w.engine).DetectCSV(ctx, r)
+}
+
 // defaultInstance is lazily initialized with all detectors.
 var (
 	defaultOnce     sync.Once
@@ -203,4 +233,24 @@ func Detect(ctx context.Context, text string) ([]model.Match, error) {
 // Process runs full PII detection and replacement using all available detectors.
 func Process(ctx context.Context, text string) (*port.Result, error) {
 	return getDefault().Process(ctx, text)
+}
+
+// RedactJSON detects and redacts PII in a JSON document using all available detectors.
+func RedactJSON(ctx context.Context, data []byte) (*structured.Result, error) {
+	return getDefault().RedactJSON(ctx, data)
+}
+
+// DetectJSON detects PII in a JSON document using all available detectors.
+func DetectJSON(ctx context.Context, data []byte) ([]structured.FieldMatch, error) {
+	return getDefault().DetectJSON(ctx, data)
+}
+
+// RedactCSV detects and redacts PII in CSV data using all available detectors.
+func RedactCSV(ctx context.Context, r io.Reader) (*structured.Result, error) {
+	return getDefault().RedactCSV(ctx, r)
+}
+
+// DetectCSV detects PII in CSV data using all available detectors.
+func DetectCSV(ctx context.Context, r io.Reader) ([]structured.FieldMatch, error) {
+	return getDefault().DetectCSV(ctx, r)
 }
